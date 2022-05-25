@@ -18,6 +18,11 @@ Poly::Poly(int nterms, int p[]) {
   cout << endl;
 }
 
+// constructor from another object, to make a copy
+Poly::Poly(const Poly &other) {
+  cout << "Poly copy constructor" << endl;
+}
+
 Poly::~Poly() {
   cout << "(virtual) Poly destructor" << endl;
   cout << this->n << " terms" << endl;
@@ -30,8 +35,16 @@ Poly::~Poly() {
 //   //  return;
 // }
 
-// constructor from another object, to make a copy
-Poly::Poly(const Poly &other) {
-  cout << "Poly copy constructor" << endl;
+void Poly::display() {
+  int& n = this->n;
+  cout << n << "-term polynomial:" ;
+  for (int t=0; t<n; ++t) {
+    int c = this->p[2*t];
+    int& e = this->p[2*t+1];
+    if (c==-1) cout << " -";
+    else cout << ' ' << c; // leaving 0 terms for now
+    if (e) cout << " q";
+    if (e>1) cout << '^' << e;
+  }
+  cout << endl;
 }
-
