@@ -19,17 +19,17 @@ class poly:
     sp = ''
     for t in s.p:
       c = t[0]
-      if c<-1: cs = str(c)
-      elif c==-1: cs = '-'
-#       elif c==0: die('zero coeff')
-      elif c==1: cs = '+'
-      else: cs = f'+{c}'
+      if c<-1: cs = f'- {-c} '
+      elif c==-1: cs = '- '
+      elif c==1: cs = '+ '
+      else: cs = f'+ {c} '
       if not c: continue
-#       if t[0]<0: plus=''
-#       else: plus='+'
-#       retval += sp+plus+f'{t[0]} q^{t[1]}'
-      retval += sp+cs+f' q^{t[1]}'
-      #       print(f'{t[0]} q^{t[1]}')
+      es = ''
+      e = t[1]
+      if e==0: es = '1'
+      elif e==1: es = 'q'
+      else: es = f'q^{e}'
+      retval += sp+cs+es
       sp = ' '
     return retval
 
