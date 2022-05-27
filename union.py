@@ -21,7 +21,7 @@ def union(Es):
     else: sign = -1
     retval.append((sign, s))
 
-  print(retval)
+  return retval
   
 #   for i in Es:
 #     retval.append((1,[i]))

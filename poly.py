@@ -1,10 +1,13 @@
+import AlgManip.util as u
+
 class poly:
-  # store as list of 2-tuples (coef, exp) for starters
-  def __init__(s, lt):
+  # store as list of 2-lists (coef, exp) for starters
+  def __init__(s, lt=((0,0),)):
 #     print('creating poly with', lt, 'of type', type(lt), type(lt[0]))
 #     print('poly:', lt)
 #     if not type(lt[0]) == "<class 'tuple'>": die('please construct with list of tuples')
-    if not isinstance(lt[0],tuple): die('please construct with list of tuples')
+    if not isinstance(lt[0],list):
+      u.die('please construct with list of tuples:' + str(lt))
     s.p = lt
 
 #   def __del__(s): print('destroying poly instance with', len(s.p), 'terms...')
@@ -42,3 +45,7 @@ class poly:
     for e in sorted(pd): p.append((pd[e],e))
     return poly(p)
   
+  def __rmul__(s, i):
+    print(f'multiplying {i} times {s}')
+    for t in s.p: t[0] *= i
+    return s
