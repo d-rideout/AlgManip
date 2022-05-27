@@ -4,8 +4,7 @@
 using namespace std;
 
 Poly::Poly() {
-  cout << "Poly bare constructor" << endl;
-  cout << "DELETE ME?" << endl;
+  cout << "Poly construct zero polynomial" << endl;
 }
 
 Poly::Poly(int nterms, int p[]) {
