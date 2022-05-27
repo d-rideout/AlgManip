@@ -2,7 +2,7 @@ class poly:
   # store as list of 2-tuples (coef, exp) for starters
   def __init__(s, lt):
 #     print('creating poly with', lt, 'of type', type(lt), type(lt[0]))
-    print('poly:', lt)
+#     print('poly:', lt)
 #     if not type(lt[0]) == "<class 'tuple'>": die('please construct with list of tuples')
     if not isinstance(lt[0],tuple): die('please construct with list of tuples')
     s.p = lt
