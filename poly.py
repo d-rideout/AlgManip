@@ -48,18 +48,18 @@ class poly:
     return poly(p)
   
   def __rmul__(s, i):
-    print(f'multiplying {i} times {s}')
+#     print(f'multiplying {i} times {s}')
     for t in s.p: t[0] *= i
     return s
 
   def __iadd__(s, o):
-    print(f'adding {o} to {s}')
+#     print(f'adding {o} to {s}')
     if isinstance(o,int):
       if s.p[0][1] != 0: u.die("first term isn't constant?")
       s.p[0][0] += o
     else:
       if not isinstance(o,poly): die('adding non-(int,poly) to poly')
-      print('adding two polynomials')
+#       print('adding two polynomials')
       pd = {} # key exponent val coeff
       for t in s.p:
         if t[1] in pd:
