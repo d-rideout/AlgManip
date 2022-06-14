@@ -5,16 +5,18 @@ class poly:
   # keep them sorted by exponent
   # I wonder if a dict might be more sensible
   def __init__(s, lt=([0,0],)):
-#     print('creating poly with', lt, 'of type', type(lt), type(lt[0]))
-#     print('poly:', lt)
-#     if not type(lt[0]) == "<class 'tuple'>": die('please construct with list of tuples')
+    'Defaults to zero polynomial'
+    # I think it is handy to store the constant term regardless (14jun022)
+    # print('creating poly with', lt, 'of type', type(lt), type(lt[0]))
+    # print('poly:', lt)
     if not isinstance(lt[0],(list,tuple)):
       u.die('please construct poly with list of lists:' + str(lt))
     s.p = lt
 
-#   def __del__(s): print('destroying poly instance with', len(s.p), 'terms...')
-    
-  def __str__(s):
+  # def __del__(s): print('destroying poly instance with', len(s.p), 'terms...')
+  # deconstructors do not have to be explicitly called in Python!
+
+  def __str__(s): # convert to pretty string
     retval = ''
     sp = ''
     for t in s.p:
@@ -33,7 +35,7 @@ class poly:
       sp = ' '
     return retval
 
-  def __imul__(s,o):
+  def __imul__(s,o): # *=
     pd = {} # key exponent val coeff
     for tl in s.p:
       for tr in o.p:
@@ -47,12 +49,12 @@ class poly:
     for e in sorted(pd): p.append([pd[e],e])
     return poly(p)
   
-  def __rmul__(s, i):
+  def __rmul__(s, i): # i * poly
 #     print(f'multiplying {i} times {s}')
     for t in s.p: t[0] *= i
     return s
 
-  def __iadd__(s, o):
+  def __iadd__(s, o): # +=
 #     print(f'adding {o} to {s}')
     if isinstance(o,int):
       if s.p[0][1] != 0: u.die("first term isn't constant?")
