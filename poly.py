@@ -1,4 +1,5 @@
 import AlgManip.util as u
+import matplotlib.pyplot as plt
 
 class poly:
   # store as list of 2-lists (coef, exp) for starters
@@ -77,3 +78,15 @@ class poly:
 #         e = t[1]
 #         if e in pd: t[0] = pd[e]
     return s
+
+  def plot(s, xs, f=None):
+    '''N = number of points
+    multiply polynomial by f if given'''
+    ys = []
+    for x in xs:
+      y = 0.
+      for n in s.p: y += n[0]*x**n[1]
+      if f: y *= f(x)
+      ys.append(y)
+    plt.plot(xs, ys, marker='o')
+    plt.show()
