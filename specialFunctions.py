@@ -2,19 +2,19 @@ def qpoch(q, n=None):
   '''(q,q)_n = [n]_q! (1-q)^n = (1-q)(1-q^2)...(1-q^n)
   no n ==> (q,q)_infinity aka Euler function'''
   if n==None:
-    m = 0
+    m = 1
     eps = 1e-9
-    prevVal = qpoch(q,m)
-    val = qpoch(q,m+1) # Though this recursive definition is surely inefficient!
+    prevVal = 1
+    val = 1-q
     while abs(prevVal-val) > eps:
       m += 1
       prevVal = val
-      val = qpoch(q,m+1)
-    print('converged at n=', m, 'at q=', q, 'to within eps=', eps)
+      val *= 1-q**m
+#     print('converged at n=', m, 'at q=', q, 'to within eps=', eps)
     return val
   if n==0: return 1 # [0]_q! (1-q)^0 = 1
 #   if n==1: return 1-q # Is this a good idea?
-  return (1-q**n)*qpoch(q,n-1)
+  return (1-q**n)*qpoch(q,n-1) # Is recursive definition less efficient? (15jun022)
 
   
 # Below taken from github.com/ectomancer/pure_python/blob/main/q-analog.ipynb on 14jun022
