@@ -10,7 +10,7 @@ def qpoch(q, n=None):
       m += 1
       prevVal = val
       val = qpoch(q,m+1)
-    print('converged at n=', m, 'to within eps=', eps)
+    print('converged at n=', m, 'at q=', q, 'to within eps=', eps)
     return val
   if n==0: return 1 # [0]_q! (1-q)^0 = 1
 #   if n==1: return 1-q # Is this a good idea?
