@@ -89,8 +89,8 @@ class poly:
       for n in s.p: y += n[0]*x**n[1]
       if f: y *= f(x)
       ys.append(y)
-    if not 'mi' in dir(s): mi = 0
-    plt.plot(xs, ys, marker=u.mplsym[mi])
-    plt.yscale('log')
-    mi += 1
+    if not 'mi' in dir(s): s.mi = 0
+#     print('plotting with marker:', u.mplsym[s.mi])
+    plt.plot(xs, ys, marker=u.mplsym[s.mi])
+    s.mi += 1
 #     plt.plot(xs, [f(x) for x in xs], marker='x')
