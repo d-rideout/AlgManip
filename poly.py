@@ -85,7 +85,7 @@ class poly:
 #         if e in pd: t[0] = pd[e]
     return s
 
-  def plot(s, xs, f=None):
+  def plot(s, xs, f=None, m=None):
     '''xs = list of x values
     multiply polynomial by f if given'''
 #     if not 'markers' in dir(s): s.markers = it.cycle(u.mplsym)
@@ -96,7 +96,8 @@ class poly:
       if f: y *= f(x)
       ys.append(y)
     if not 'mi' in dir(s): s.mi = 0
-#     print('plotting with marker:', u.mplsym[s.mi])
-    plt.plot(xs, ys, marker=u.mplsym[s.mi])
+    #     print('plotting with marker:', u.mplsym[s.mi])
+    if m==None: m = u.mplsym[s.mi]
+    plt.plot(xs, ys, marker=m)
     s.mi += 1
 #     plt.plot(xs, [f(x) for x in xs], marker='x')
