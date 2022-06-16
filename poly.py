@@ -101,3 +101,43 @@ class poly:
     plt.plot(xs, ys, marker=m)
     s.mi += 1
 #     plt.plot(xs, [f(x) for x in xs], marker='x')
+
+
+def str2poly(st):
+  '''convert string output of poly (__str__ method) into poly
+  (assuming non-gnuplot string)'''
+  # (using brute-force approach 'for fun'...)
+
+  # convert input string st to list of terms
+  tl = []
+  t = None
+  for c in st:
+    if c=='+' or c=='-':
+#       print(c, end='')
+      if t: tl.append(t)
+      t = c
+    elif c==' ': continue
+    else: t += c
+#   print(tl)
+
+  # parse terms
+  pl = []
+  for t in tl:
+    co = ''
+    ex = ''
+    mode = 'c'
+    for c in t:
+      if c=='+' or c=='^': continue
+      if c=='q':
+        mode = 'e'
+        continue
+      if mode=='c': co += c
+      else: ex += c
+    if co=='': co = '1'
+    elif co=='-': co = '-1'
+    if ex=='':
+      if mode=='c': ex = '0'
+      else: ex = '1'
+    pl.append([int(co),int(ex)])
+
+  return poly(pl)
