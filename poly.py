@@ -20,18 +20,24 @@ class poly:
   def __str__(s): # convert to pretty string
     retval = ''
     sp = ''
+    if u.gnuplot:
+      msm = '*'
+      esm = '**'
+    else:
+      msm = ' '
+      esm = '^'
     for t in s.p:
-      c = t[0]
-      if c<-1: cs = f'- {-c} '
-      elif c==-1: cs = '- '
-      elif c==1: cs = '+ '
-      else: cs = f'+ {c} '
-      if not c: continue
+      co = t[0]
+      if co<-1: cs = f'- {-co}'+msm
+      elif co==-1: cs = '- '
+      elif co==1: cs = '+ '
+      else: cs = f'+ {co}'+msm
+      if not co: continue
       es = ''
-      e = t[1]
-      if e==0: es = '1'
-      elif e==1: es = 'q'
-      else: es = f'q^{e}'
+      ex = t[1]
+      if ex==0: es = '1'
+      elif ex==1: es = 'q'
+      else: es = f'q{esm}{ex}'
       retval += sp+cs+es
       sp = ' '
     return retval
