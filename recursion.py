@@ -31,13 +31,18 @@ class relation:
       if sf.lhsMins[s] < lhs.mins[s]: sf.lhsMins[s] = lhs.mins[s]
 
 
-def recursionCauset(fn, rl):
+def recursionCauset(fn, rl, max):
   if exists(fn): print(fn, 'exists, overwriting')
   rt = fn[:-4]
   fp = open(fn, 'w')
   fp.write(f'# dot -Tpdf -o {rt}.pdf {fn}\ndigraph "{rt}" ')
   fp.write('{\nrankdir=BT; concentrate=true; node[shape=plaintext];\n')
-  for r in rl: print(r.lhs, r.lhsMins)
+  for r in rl:
+    print(r.lhs, r.lhsMins)
+    i = r.lhsMins[:]
+    while True:
+      print(i)
+      if u.incList(i, r.lhsMins, max): break
 
   fp.write('}\n')
   fp.close()
