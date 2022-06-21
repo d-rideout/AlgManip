@@ -15,11 +15,12 @@ class var:
   
 class relation:
   def __init__(sf, lhs, rhs, cf=lambda ix: True):
-    '''lhs: var
+    '''lhs = var
+    rhs = tuple of (1+ns)-tuples (var, (slot, offset), (slot, offset), ...)
+    cf = constraintFunction to check if indices valid
+    where:
     ns = num slots
-    rhs: tuple of (1+ns)-tuples (var, (slot, offset), (slot, offset), ...)
-    first slot is 0
-    cf = constraintFunction to check if indices valid'''
+    first slot is 0'''
     sf.lhs = lhs
     sf.rhs = rhs
     sf.cf = cf

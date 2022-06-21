@@ -62,10 +62,9 @@ class poly:
     for e in sorted(pod): p.append([pod[e],e])
     return poly(p)
   
-  def __imul__(s,o): return s.mul(o) # Should this rather change s in place?
-  # May be more efficient? (20jun022)
-  # Why does this work at all??
-  # It probably doesn't -- I need a test! (20jun022)
+  def __imul__(s,o):
+    s = s.mul(o)
+    return s
 
   def __mul__(s,o): return s.mul(o)
 
@@ -119,6 +118,7 @@ class poly:
 
 
 def omqn(n): # (Think about how to generalize this later)
+  # --> Overload ** to do multinomial expansion
   'returns (1-q)^n'
   rv = []
   s = 1

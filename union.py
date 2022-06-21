@@ -3,7 +3,8 @@ import AlgManip.util as util
 # class union:
 # (class will be useful when user wants more than one union in parallel (14jun022))
 def union(Es):
-  '''Return sequence of signed non-empty subsets of input set of events Es
+  '''Write measure of union as sum over intersections.
+  Return sequence of signed non-empty subsets of input set of events Es
   as list of 2-tuples (sign, list of atomic events)'''
   #def __init__(s,Es):
   if not isinstance(Es, (tuple, list)):
