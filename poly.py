@@ -48,20 +48,27 @@ class poly:
       sp = ' '
     return retval
 
-  def __imul__(s,o): # *=
-    pd = {} # key exponent val coeff
+  def mul(s,o):
+    pod = {} # key exponent val coeff
     for tl in s.p:
       for tr in o.p:
 #         print(f'multiplying {tl} with {tr}')
         e = tl[1]+tr[1]
 #         print(e)
-        if e in pd: pd[e] += tl[0]*tr[0]
-        else: pd[e] = tl[0]*tr[0]
-#     print(sorted(pd))
+        if e in pod: pod[e] += tl[0]*tr[0]
+        else: pod[e] = tl[0]*tr[0]
+#     print(sorted(pod))
     p = []
-    for e in sorted(pd): p.append([pd[e],e])
+    for e in sorted(pod): p.append([pod[e],e])
     return poly(p)
   
+  def __imul__(s,o): return s.mul(o) # Should this rather change s in place?
+  # May be more efficient? (20jun022)
+  # Why does this work at all??
+  # It probably doesn't -- I need a test! (20jun022)
+
+  def __mul__(s,o): return s.mul(o)
+
   def __rmul__(s, i): # i * poly
 #     print(f'multiplying {i} times {s}')
     for t in s.p: t[0] *= i
@@ -73,7 +80,9 @@ class poly:
       if s.p[0][1] != 0: u.die("first term isn't constant?")
       s.p[0][0] += o
     else:
-      if not isinstance(o,poly): die('adding non-(int,poly) to poly')
+      if not isinstance(o,poly):
+        print(type(o))
+        u.die(o+'adding non-(int,poly) to poly')
 #       print('adding two polynomials')
       pd = {} # key exponent val coeff
       for t in s.p:

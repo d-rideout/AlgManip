@@ -8,7 +8,7 @@ class digraph: # distinguish this from an ordinary graph?
     # Do I want to pass n each time, or make it global?
     s.n = n
     s.g = g
-  def __str__(s):
+  def __str__(s): # cf pypi.org/project/diGraph ?
     rv = ''
     sp = ''
     for j in range(1,s.n):
