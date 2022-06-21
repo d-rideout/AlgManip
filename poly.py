@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+# import math as m
+import scipy.special as ss
 import AlgManip.util as u
 
 class poly:
@@ -24,8 +26,8 @@ class poly:
       msm = '*'
       esm = '**'
     else:
-      msm = ' '
-      esm = '^'
+      msm = ' ' # multiply symbol
+      esm = '^' # exponent symbol
     for t in s.p:
       co = t[0]
       if co<-1: cs = f'- {-co}'+msm
@@ -35,7 +37,11 @@ class poly:
       if not co: continue
       es = ''
       ex = t[1]
-      if ex==0: es = '1'
+      if ex==0:
+        if co==1: es = '1'
+        else:
+          es = ''
+          cs = cs[:-1] # trim multiplication symbol on constant term
       elif ex==1: es = 'q'
       else: es = f'q{esm}{ex}'
       retval += sp+cs+es
@@ -101,6 +107,16 @@ class poly:
     plt.plot(xs, ys, marker=m)
     s.mi += 1
 #     plt.plot(xs, [f(x) for x in xs], marker='x')
+
+
+def omqn(n): # (Think about how to generalize this later)
+  'returns (1-q)^n'
+  rv = []
+  s = 1
+  for i in range(n+1):
+    rv.append([s*ss.comb(n,i, exact=True),i])
+    s *= -1
+  return poly(rv)
 
 
 def str2poly(st):
