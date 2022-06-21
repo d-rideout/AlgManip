@@ -4,18 +4,22 @@
 import AlgManip.recursion as rc
 
 # Internal state variables
-rcl = None
+rrl = None
 
 # Use maximally lazy evaluation
 # e.g. do not even compute dependencies
 class node: # partly to avoid deciding upon a less generic name
-  '''Instance attributes:
-  var (e.g. in recursion)
-  dependencies -- compute from recursion list
-  val
-  (guess)
-  '''
-  G = {}  # ground set of nodes?
+  # Instance attributes:
+  # - var (e.g. in recursion)
+  # - it  index tuple
+  # - dp  dependencies -- compute from recursion list
+  #   None ==> uninitialized
+  #   0 ==> no dependency
+  #   list [(var,it), ...]
+  # - val
+  # - (guess)
+
+  G = {}  # node db indexed by (var, it)
   # dict: laziness ==> avoid computations over all nodes
 #   n = 0   # store number of nodes?
 
@@ -24,11 +28,31 @@ class node: # partly to avoid deciding upon a less generic name
     # Can I get away with using tuple instead of list?
     sf.var = var
     sf.it = it
-    node.G[it] = sf
+    sf.dp = None
+    node.G[(var,it)] = sf
     #     node.G.append(sf)
 #     node.n += 1
 
   def __str__(s): return f'node {s.var.name}{s.it}'
+
+  def updateDep(sf):
+    print('updating', sf)
+    if rrl: # only know recursion at the moment (21jun022)
+      for rr in rrl: # recursion relation
+        if rr.lhs!=sf.var: continue # print('no')
+        if sf.dp: print(sf, "already has dependency (FIXME)")
+        # lhs of rr matches sf:
+        sf.dp = [] # build dependency list [ (var, it), ... ]
+        for r in rr.rhs: # (1+ns)-tuples (var, (slot, offset), (slot, offset), ...)
+          print('var r=',r)
+#           t = r[0], # var, index tuple
+          it = () # var, index tuple
+          for s in r[1:]:
+            print('slot=',s)
+            it += sf.it[s[0]]+s[1],
+          print('depends on', r[0], it)
+          sf.dp.append((r[0],it))
+    else: print('unclear on how to decide on dependency of', sf)
   
 
 # def recurse(rl):
@@ -37,10 +61,17 @@ class node: # partly to avoid deciding upon a less generic name
 def recursion(rl):
   '''Declare recursion
   rl = recursion relation list'''
-  rcl = rl
+  global rrl
+  rrl = rl
 
   
 def request(nd):
   'Request node nd'
   print('Requested', nd)
   
+  # Does nd have dependencies?
+#   print(dir(nd))
+#   dp = dir(nd).get('dp')
+#   if not 'dp' in dir(nd)
+  if nd.dp==None: nd.updateDep()
+  print(nd.dp)
