@@ -1,4 +1,7 @@
 from os.path import exists
+# print(__name__)
+# if __name__=='__main__': import util as u
+# else:
 import AlgManip.util as u
 
 debug = False
@@ -21,11 +24,12 @@ class relation:
     where:
     ns = num slots
     first slot is 0'''
+    if debug:
+      print('lhs:', lhs)
+      print('rhs:')
     sf.lhs = lhs
     sf.rhs = rhs
     sf.cf = cf
-    if debug: print('lhs:', lhs)
-    if debug: print('rhs:')
     sf.lhsMins = [0]*len(lhs.mins)
     for t in rhs:
       if debug: print(' t = ', t)
