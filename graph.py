@@ -1,5 +1,5 @@
-'Fast DAG module' # include all graphs?
-# 'Fast digraph module' # include all graphs?
+'Fast DAG (directed acyclic graph) module' # include all graphs?
+# 'Fast digraph module' (drop the acyclic assumption?)
 
 def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
 

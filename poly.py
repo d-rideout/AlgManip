@@ -4,6 +4,8 @@ import scipy.special as ss
 import AlgManip.util as u
 
 class poly:
+  sym = 'q'
+
   # store as list of 2-lists (coef, exp) for starters
   # keep them sorted by exponent
   # I wonder if a dict might be more sensible
@@ -42,8 +44,8 @@ class poly:
         else:
           es = ''
           cs = cs[:-1] # trim multiplication symbol on constant term
-      elif ex==1: es = 'q'
-      else: es = f'q{esm}{ex}'
+      elif ex==1: es = poly.sym # 'q'
+      else: es = f'{poly.sym}{esm}{ex}'
       retval += sp+cs+es
       sp = ' '
     return retval
@@ -119,7 +121,7 @@ class poly:
 
 def omqn(n): # (Think about how to generalize this later)
   # --> Overload ** to do multinomial expansion
-  'returns (1-q)^n'
+  f'returns (1-{poly.sym})^n'
   rv = []
   s = 1
   for i in range(n+1):
@@ -153,7 +155,7 @@ def str2poly(st):
     mode = 'c'
     for c in t:
       if c=='+' or c=='^': continue
-      if c=='q':
+      if c==poly.sym: # 'q':
         mode = 'e'
         continue
       if mode=='c': co += c
