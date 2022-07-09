@@ -7,6 +7,7 @@
 #   import recursion as rc
 # else:
 import AlgManip.recursion as rc
+# import recursion as rc
 
 # debug = True
 debug = False
@@ -87,6 +88,7 @@ def nf(vt):
   n = G.get(vt)
   if n: return n
   return node(vt[0],vt[1]) #var,it)
+
 
 # def recurse(rl):
 #   '''execute the recursion or just declare it?
