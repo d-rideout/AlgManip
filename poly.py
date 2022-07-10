@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
-# import math as m
-import scipy.special as ss
-import AlgManip.util as u
+import scipy.special as ss # binomial coefficients
+# import AlgManip.util as u
+# from . import util
+# from .util import *
+import util as u
 
 class poly:
   sym = 'q'
@@ -48,6 +50,7 @@ class poly:
       else: es = f'{poly.sym}{esm}{ex}'
       retval += sp+cs+es
       sp = ' '
+    if retval=='': retval = '0'
     return retval
 
   def mul(s,o):
@@ -84,7 +87,7 @@ class poly:
       if not isinstance(o,poly):
         print(type(o))
         u.die(o+'adding non-(int,poly) to poly')
-#       print('adding two polynomials')
+      # print('adding two polynomials')
       pd = {} # key exponent val coeff
       for t in s.p:
         if t[1] in pd:
@@ -119,9 +122,10 @@ class poly:
 #     plt.plot(xs, [f(x) for x in xs], marker='x')
 
 
-def omqn(n): # (Think about how to generalize this later)
-  # --> Overload ** to do multinomial expansion
+def omqn(n):
   f'returns (1-{poly.sym})^n'
+  # (Think about how to generalize this later)
+  # --> Overload ** to do multinomial expansion
   rv = []
   s = 1
   for i in range(n+1):
@@ -133,7 +137,7 @@ def omqn(n): # (Think about how to generalize this later)
 def str2poly(st):
   '''convert string output of poly (__str__ method) into poly
   (assuming non-gnuplot string)'''
-  # (using brute-force approach 'for fun'...)
+  # (using brute-force (non-regex) approach 'for fun'...)
 
   # convert input string st to list of terms
   tl = []

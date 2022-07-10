@@ -1,5 +1,13 @@
 print('Importing AlgManip python package module')
 
+import sys
+
+# print(sys.path)
+sys.path.insert(1,'AlgManip')
+# print(sys.path)
+# My local imports are not package imports when called from other directories
+# But am I duplicating modules this way?  Probably.  How do people manage this?
+
 if False:
   import os
   from datetime import date
