@@ -6,19 +6,22 @@ import scipy.special as ss # binomial coefficients
 import util as u
 
 class poly:
+  'polynomial with integer coefficients'
   sym = 'q'
 
-  # store as list of 2-lists (coef, exp) for starters
-  # keep them sorted by exponent
-  # I wonder if a dict might be more sensible
-  def __init__(s, lt=([0,0],)):
+  # store as dict: keys tuple of exponents val coefficient
+  # **last exponent must be non-zero**
+
+  def __init__(s, p={}):
     'Defaults to zero polynomial'
-    # I think it is handy to store the constant term regardless (14jun022)
+    # Can also construct from list of lists (coef, exp0, exp1, ...) (deprecate?)
+
     # print('creating poly with', lt, 'of type', type(lt), type(lt[0]))
-    # print('poly:', lt)
-    if not isinstance(lt[0],(list,tuple)):
-      u.die('please construct poly with list of lists:' + str(lt))
-    s.p = lt
+    if isinstance(p, dict): s.p = p
+    elif isinstance(p,(list,tuple)):
+      s.p = {}
+      for t in p: s.p[tuple(t[1:])] = t[0]
+    else: u.die('please construct poly with dict or list of lists:' + str(p))
 
   # def __del__(s): print('destroying poly instance with', len(s.p), 'terms...')
   # deconstructors do not have to be explicitly called in Python!
@@ -32,15 +35,15 @@ class poly:
     else:
       msm = ' ' # multiply symbol
       esm = '^' # exponent symbol
-    for t in s.p:
-      co = t[0]
+    for ex,co in s.p.items():
+#       co = t[0]
       if co<-1: cs = f'- {-co}'+msm
       elif co==-1: cs = '- '
       elif co==1: cs = '+ '
       else: cs = f'+ {co}'+msm
       if not co: continue
       es = ''
-      ex = t[1]
+#       ex = t[1]
       if ex==0:
         if co==1: es = '1'
         else:
@@ -53,8 +56,11 @@ class poly:
     if retval=='': retval = '0'
     return retval
 
+
   def mul(s,o):
-    pod = {} # key exponent val coeff
+#     pod = {} # key exponent val coeff
+    # Don't want to mess with changing dict in place
+#     retval =
     for tl in s.p:
       for tr in o.p:
 #         print(f'multiplying {tl} with {tr}')
@@ -67,38 +73,40 @@ class poly:
     for e in sorted(pod): p.append([pod[e],e])
     return poly(p)
   
-  def __imul__(s,o):
+  def __imul__(s,o): # *=
     s = s.mul(o)
     return s
 
-  def __mul__(s,o): return s.mul(o)
+  def __mul__(s,o): return s.mul(o) # poly * o
 
   def __rmul__(s, i): # i * poly
 #     print(f'multiplying {i} times {s}')
     for t in s.p: t[0] *= i
     return s
 
+
   def __iadd__(s, o): # +=
 #     print(f'adding {o} to {s}')
     if isinstance(o,int):
-      if s.p[0][1] != 0: u.die("first term isn't constant?")
-      s.p[0][0] += o
+#       if s.p[0][1] != 0: u.die("first term isn't constant?")
+      s.p[()] += o # Is it possible to have an empty key?  Do we want an empty tuple anyway?
     else:
       if not isinstance(o,poly):
         print(type(o))
         u.die(o+'adding non-(int,poly) to poly')
       # print('adding two polynomials')
-      pd = {} # key exponent val coeff
-      for t in s.p:
-        if t[1] in pd:
-          pd[t[1]] += t[0]
-          die('duplicate term found!')
-        else: pd[t[1]] = t[0]
-      for t in o.p:
-        if t[1] in pd: pd[t[1]] += t[0]
-        else: pd[t[1]] = t[0]
-      s.p = [] # too violent??
-      for e in sorted(pd): s.p.append([pd[e],e])
+#       pd = {} # key exponent val coeff
+#       for t in s.p:
+#         if t[1] in pd:
+#           pd[t[1]] += t[0]
+#           die('duplicate term found!')
+#         else: pd[t[1]] = t[0]
+      for e,c in o.p.items():
+#         if t[1] in pd: pd[t[1]] += t[0]
+        if e in s.p: s.p[e] += c
+        else: s.p[e] = c
+        if not s.p[e]: del s.p[e]
+#       for e in sorted(pd): s.p.append([pd[e],e])
 #       for t in s.p:
 #         e = t[1]
 #         if e in pd: t[0] = pd[e]
