@@ -7,7 +7,12 @@ import util as u
 
 class poly:
   'polynomial with integer coefficients'
-  sym = 'q'
+  sym = 'q' # name of variable(s)
+  mv = None # multi-variable polynomials
+  # (This is a property of a family of polynomials, not a single polynomial.)
+  # It is safest for the user to set this attribute value manually, but it can
+  # probably be deduced from context if not?
+  # False ==> never check if multi-variable
 
   # store as dict: keys tuple of exponents val coefficient
   # **last exponent must be non-zero**
@@ -27,6 +32,14 @@ class poly:
   # deconstructors do not have to be explicitly called in Python!
 
   def __str__(s): # convert to pretty string
+    # Check multi-variable status
+    if poly.mv==None:
+      for e in s.p:
+        if len(e)>1:
+          poly.mv = True
+          break
+#       else: poly.mv = False -- need to recheck every time
+
     retval = ''
     sp = ''
     if u.gnuplot:
@@ -58,30 +71,30 @@ class poly:
 
 
   def mul(s,o):
-#     pod = {} # key exponent val coeff
     # Don't want to mess with changing dict in place
-#     retval =
-    for tl in s.p:
-      for tr in o.p:
+    p = {}
+    for elt,cl in s.p.items():
+      for ert,cr in o.p.items():
 #         print(f'multiplying {tl} with {tr}')
-        e = tl[1]+tr[1]
-#         print(e)
-        if e in pod: pod[e] += tl[0]*tr[0]
-        else: pod[e] = tl[0]*tr[0]
-#     print(sorted(pod))
-    p = []
-    for e in sorted(pod): p.append([pod[e],e])
-    return poly(p)
+        ept = []
+        for el,er in zip(elt, ert):
+          ept.append(el+er)
+        ept = tuple(ept)
+        if ept in p: p[ept] += cl*cr
+        else: p[ept] = cl*cr
+    return p
+#     return poly(p) can i just pass the dict?
+
   
   def __imul__(s,o): # *=
-    s = s.mul(o)
+    s.p = s.mul(o)
     return s
 
-  def __mul__(s,o): return s.mul(o) # poly * o
+  def __mul__(s,o): return poly(s.mul(o)) # poly * o
 
   def __rmul__(s, i): # i * poly
 #     print(f'multiplying {i} times {s}')
-    for t in s.p: t[0] *= i
+    for e in s.p: c.p[e] *= i
     return s
 
 

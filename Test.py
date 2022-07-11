@@ -9,8 +9,10 @@ np = 0
 def check(expr, expect):
   global np
   got = str(expr)
-  if got != expect: print(f'fail: got [{got}] expect [{expect}]')
-  else: np += 1
+  if got == expect:
+    print(f'pass: [{got}]')
+    np += 1
+  else: print(f'fail: got [{got}] expect [{expect}]')
 
 pm.poly.sym = 'x'
 p = pm.poly()
