@@ -21,9 +21,8 @@ class poly:
     'Defaults to zero polynomial'
     # Can also construct from list of lists (coef, exp0, exp1, ...) (deprecate?)
 
-    # print('creating poly with', lt, 'of type', type(lt), type(lt[0]))
     if isinstance(p, dict): s.p = p
-    elif isinstance(p,(list,tuple)):
+    elif isinstance(p,(list,tuple)): # deprecate this?
       s.p = {}
       for t in p: s.p[tuple(t[1:])] = t[0]
     else: u.die('please construct poly with dict or list of lists:' + str(p))

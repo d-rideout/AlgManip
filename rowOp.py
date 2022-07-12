@@ -4,6 +4,12 @@
 from sys import argv
 from copy import deepcopy
 import fractions as f
+import poly as pm
+
+debug = False
+fme = 2, 2 # show formula for this matrix element
+           # assume row is not involved in row swaps for now
+           # Please use internal indices for now
 
 def prm(M):
   print()
@@ -14,14 +20,17 @@ def prm(M):
 
 # Store matrix as list of rows
 M = [[]]
-h = []
+h = [] # command history
 
-# Read matrix from command line??
+# Read matrix from command line
 # a/b c/d ... e/f, ... (; is captured by shell)
 # print(argv)
-ri = 0
+if len(argv)<2:
+  print('Specify matrix on command line as comma separated rows of space separated columns')
+  exit()
+ri = 0 # row index
 for x in argv[1:]:
-#   print(x)
+  if debug: print(f'[{x}]')
   if x[-1]==',':
     x = x[:-1]
     M[ri].append(f.Fraction(x))
@@ -32,11 +41,34 @@ for x in argv[1:]:
 m = len(M)
 n = len(M[0])
 print(f'{m} x {n} matrix')
-# print(M)
-# print(f.Fraction(1,37))
-# print(f.Fraction(37,1))
-# print(f.Fraction(37,0))
 
+o2c = list(range(m)) # permutation map from original row indices to the current ones
+c2o = list(range(m)) # inverse of o2c
+# All indices start at 0 internally, but 1 from user's perspective.
+nswaps = 0
+
+# Polynomial wrapping
+if fme:
+  def pi(i,j):
+    "map from matrix indices to variable index"
+    global n
+    return n*i + j
+
+  def pt(i,j): # polynomial term
+    "return polynomial of one matrix element?"
+    print(f'pt(): matrix elt {i},{j}')
+    return pm.poly({tuple([0]*pi(i,j)+[1]):1})
+#     maybe construct from dict is simpler
+#     el.append(1)
+#     print(el)
+#     return pm.poly()
+
+  vn = [] # variable names
+  for r in range(m):
+    for c in range(n): vn.append(pi(r,c))
+
+#   p = pm.poly()
+    
 while 1:
   prm(M)
   cmd = input('> ')
@@ -73,6 +105,11 @@ u          undo
     #     else: x = 1
     #     print(rr, ro, x)
     for c in range(n): M[rr][c] += x*M[ro][c]
+    if fme:
+      p = pt(fme[0],fme[1])
+      print(p.p)
+      print('term:', p)
+      exit()
     
   elif vb=='s':
     r = int(cmd[0])-1
@@ -87,6 +124,10 @@ u          undo
     r = M[r1]
     M[r1] = M[r2]
     M[r2] = r
+    o2c[r1], o2c[r2] = o2c[r2], o2c[r1]
+    c2o[r1], c2o[r2] = c2o[r2], c2o[r1]
+    if nswaps: print('FIXME: Handling of row permutations is likely incorrect!')
+    nswaps += 1
 
   else: print(f'invalid verb {vb}')
 
