@@ -5,6 +5,9 @@ import scipy.special as ss # binomial coefficients
 # from .util import *
 import util as u
 
+# debug = True
+debug = False
+
 class poly:
   'polynomial with integer coefficients'
   sym = 'q' # name of variable(s)
@@ -51,26 +54,34 @@ class poly:
     else:
       msm = ' ' # multiply symbol
       esm = '^' # exponent symbol
-    for ext,co in s.p.items():
-      print('ex=', ext)
-      if co<-1: cs = f'- {-co}'+msm
-      elif co==-1: cs = '- '
-      elif co==1: cs = '+ '
-      else: cs = f'+ {co}'+msm
-      if not co: continue
-      es = '' # exponent string
+    for ext,co in sorted(s.p.items()):
+      if debug: print(f'co={co} ext=', ext)
 
+      # compute exponent string
+      es = '' # exponent string
       for i, ex in enumerate(ext):
+        # get variable name
         if poly.mv==False: s = poly.sym
         else: s = f'{poly.sym}{i}'
-        if ex==0:
-          if co==1: es = '1'
-          else:
-            es = ''
-            cs = cs[:-1] # trim multiplication symbol on constant term
-        elif ex==1: es = s
-        else: es = f'{s}{esm}{ex}'
 
+        if ex==0: pass
+        elif ex==1: es += s
+        else: es += f'{s}{esm}{ex}'
+
+      # compute coefficient string
+      if co<-1:
+        cs = f'- {-co}'
+        if es: cs += msm
+      elif co==-1: cs = '- '
+      elif co==1:
+        cs = '+ '
+        if not es: cs += '1'
+      else:
+        cs = f'+ {co}' #+msm
+        if es: cs += msm
+      if not co: continue
+
+      if debug: print(f'sp=[{sp}] cs=[{cs}] es=[{es}]')
       retval += sp+cs+es
       sp = ' '
     if retval=='': retval = '0'
@@ -101,7 +112,7 @@ class poly:
 
   def __rmul__(s, i): # i * poly
 #     print(f'multiplying {i} times {s}')
-    for e in s.p: c.p[e] *= i
+    for e in s.p: s.p[e] *= i
     return s
 
 
