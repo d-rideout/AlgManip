@@ -15,6 +15,8 @@ def check(expr, expect):
   else: print(f'fail: got [{got}] expect [{expect}]')
 
 pm.poly.sym = 'x'
+pm.poly.mv = False
+
 p = pm.poly()
 check(p, '0')
 

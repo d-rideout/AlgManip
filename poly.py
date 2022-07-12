@@ -40,30 +40,38 @@ class poly:
           break
 #       else: poly.mv = False -- need to recheck every time
 
+    # True : write using multi-variable assumption
+    # False : write using single variable assumption
+    # None : must assume multi-variable
+
     retval = ''
-    sp = ''
+    sp = '' # space between terms
     if u.gnuplot:
       msm = '*'
       esm = '**'
     else:
       msm = ' ' # multiply symbol
       esm = '^' # exponent symbol
-    for ex,co in s.p.items():
-#       co = t[0]
+    for ext,co in s.p.items():
+      print('ex=', ext)
       if co<-1: cs = f'- {-co}'+msm
       elif co==-1: cs = '- '
       elif co==1: cs = '+ '
       else: cs = f'+ {co}'+msm
       if not co: continue
-      es = ''
-#       ex = t[1]
-      if ex==0:
-        if co==1: es = '1'
-        else:
-          es = ''
-          cs = cs[:-1] # trim multiplication symbol on constant term
-      elif ex==1: es = poly.sym # 'q'
-      else: es = f'{poly.sym}{esm}{ex}'
+      es = '' # exponent string
+
+      for i, ex in enumerate(ext):
+        if poly.mv==False: s = poly.sym
+        else: s = f'{poly.sym}{i}'
+        if ex==0:
+          if co==1: es = '1'
+          else:
+            es = ''
+            cs = cs[:-1] # trim multiplication symbol on constant term
+        elif ex==1: es = s
+        else: es = f'{s}{esm}{ex}'
+
       retval += sp+cs+es
       sp = ' '
     if retval=='': retval = '0'
