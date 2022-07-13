@@ -59,14 +59,17 @@ class poly:
 
       # compute exponent string
       es = '' # exponent string
+      esp = '' # space between factors
       for i, ex in enumerate(ext):
+        if debug: print(f'var {i} ex {ex} esp [{esp}]')
         # get variable name
         if poly.mv==False: s = poly.sym
         else: s = f'{poly.sym}{i}'
 
-        if ex==0: pass
-        elif ex==1: es += s
-        else: es += f'{s}{esm}{ex}'
+        if ex==0: continue
+        elif ex==1: es += esp+s
+        else: es += esp+f'{s}{esm}{ex}'
+        esp = ' '
 
       # compute coefficient string
       if co<-1:
