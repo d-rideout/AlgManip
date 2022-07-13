@@ -3,13 +3,16 @@
 
 from sys import argv
 from copy import deepcopy
-import fractions as f
+import fractions as f # docs.python.org/3/library/fractions.html
 import poly as pm
 
 debug = False
-fme = 2, 2 # show formula for this matrix element
+fme = None
+# 2, 2 # show formula for this matrix element
            # assume row is not involved in row swaps for now
            # Please use internal indices for now
+           # IN GENERAL I SHOULD NEED TO COMPUTE THE ENTIRE COLUMN!
+           # AND DON'T FORGET THAT THE MULTIPLIERS IN THE ROW XFORMS ARE THEMSELVES FUNCTIONS OF MATRIX ELEMENTS!!
 
 def prm(M):
   print()
@@ -17,6 +20,8 @@ def prm(M):
     print('[ ', end='')
     for c in r: print('%3s' % c, end=' ')
     print(']')
+  if fme: print(p)
+
 
 # Store matrix as list of rows
 M = [[]]
@@ -56,7 +61,7 @@ if fme:
 
   def pt(i,j): # polynomial term
     "return polynomial of one matrix element?"
-    print(f'pt(): matrix elt {i},{j}')
+    print(f'pt(): requested poly of matrix elt {i},{j}')
     return pm.poly({tuple([0]*pi(i,j)+[1]):1})
 #     maybe construct from dict is simpler
 #     el.append(1)
@@ -67,7 +72,7 @@ if fme:
   for r in range(m):
     for c in range(n): vn.append(pi(r,c))
 
-#   p = pm.poly()
+  p = pt(fme[0],fme[1])
     
 while 1:
   prm(M)
@@ -106,11 +111,10 @@ u          undo
     #     print(rr, ro, x)
     for c in range(n): M[rr][c] += x*M[ro][c]
     if fme:
-      p = pt(fme[0],fme[1])
-      print(p.p)
-      print('term:', p)
-      exit()
-    
+      if rr==fme[0]: p += x*pt(ro,fme[1])
+#       elif ro==fme[0]: p += x*pt(ro,fme[1])
+
+
   elif vb=='s':
     r = int(cmd[0])-1
     x = f.Fraction(cmd[1])
@@ -124,10 +128,11 @@ u          undo
     r = M[r1]
     M[r1] = M[r2]
     M[r2] = r
-    o2c[r1], o2c[r2] = o2c[r2], o2c[r1]
-    c2o[r1], c2o[r2] = c2o[r2], c2o[r1]
-    if nswaps: print('FIXME: Handling of row permutations is likely incorrect!')
-    nswaps += 1
+    if fme:
+      o2c[r1], o2c[r2] = o2c[r2], o2c[r1]
+      c2o[r1], c2o[r2] = c2o[r2], c2o[r1]
+      if nswaps: print('FIXME: Handling of row permutations is likely incorrect!')
+      nswaps += 1
 
   else: print(f'invalid verb {vb}')
 
