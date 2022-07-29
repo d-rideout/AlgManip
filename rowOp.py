@@ -31,12 +31,15 @@ h = [] # command history
 # a/b c/d ... e/f, ... (; is captured by shell)
 # print(argv)
 if len(argv)<2:
-  print('Specify matrix on command line as comma separated rows of space separated columns')
+  print('''Perform row operations on matrix
+Specify matrix on command line as space separated list of elements
+Put , or + after last element of all but the last row''')
+# separated rows of space separated columns')
   exit()
 ri = 0 # row index
 for x in argv[1:]:
   if debug: print(f'[{x}]')
-  if x[-1]==',':
+  if x[-1]==',' or x[-1]=='+':
     x = x[:-1]
     M[ri].append(f.Fraction(x))
     ri += 1
@@ -137,4 +140,5 @@ u          undo
   else: print(f'invalid verb {vb}')
 
 # Save history?
+print('Command history:')
 for cm in h: print(cm)
