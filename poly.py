@@ -226,9 +226,28 @@ def str2poly(st): # build this into poly constructor?
   return poly(pd)
 
 
+def str2rat(st): # build this into ratFunc constructor?
+  'convert string into ratFunc'
+  # ignore () for the moment and assume simple format
+  p = ''
+  n = None
+  for c in st:
+    if c=='/':
+      n = p
+      p = ''
+    else: p += c
+  if n: return ratFunc(str2poly(n),str2poly(p))
+  else: return ratFunc(str2poly(p),poly({(0,):1}))
+
+
 class ratFunc(poly):
   'rational function (ratio of polynomials)'
 
   def __init__(s, pn, pd):
     'numerator and denominator can be polys or argument to poly constructor'
-    print(type(pn), isinstance(pn,poly))
+    #     print(type(pn), isinstance(pn,poly))
+    s.n = pn
+    s.d = pd
+
+  def __str__(s):
+    return f'({s.n})/({s.d})'

@@ -5,11 +5,13 @@ from sys import argv
 from copy import deepcopy
 import fractions as f # docs.python.org/3/library/fractions.html
 import poly as pm
-pm.poly.sym = 'l'
+# pm.poly.sym = 'l'
 pm.poly.mv = False
 po = False # matrix contains polynomial entries
 
-debug = False
+# debug = False
+debug = True
+
 fme = None
 # 2, 2 # show formula for this matrix element
            # assume row is not involved in row swaps for now
@@ -44,7 +46,12 @@ Put , or + after last element of all but the last row''')
   exit()
 ri = 0 # row index
 for x in argv[1:]:
-  if 'l' in x: po = True
+  if 'l' in x:
+    po = True
+    pm.poly.sym = 'l'
+  elif 's' in x:
+    po = True
+    pm.poly.sym = 's'
   if debug: print(f'[{x}]')
   if x[-1]==',' or x[-1]=='+':
     x = x[:-1]
@@ -96,6 +103,7 @@ while 1:
   cmd = input('> ')
   h.append(cmd)
   cmd = cmd.split()
+  if debug: print(cmd)
   if cmd: vb = cmd.pop(0)
   else: vb = ''
   # special commands
@@ -133,8 +141,9 @@ u          undo
 
 
   elif vb=='s':
-    r = int(cmd[0])-1
-    x = f.Fraction(cmd[1])
+    r = int(cmd[0])-1 # row to scale
+    if po: x = pm.str2rat(cmd[1])
+    else: x = f.Fraction(cmd[1])
     print(f'Scale row {r+1} by {x}')
     for c in range(n): M[r][c] *= x
 
