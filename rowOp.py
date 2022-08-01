@@ -9,8 +9,8 @@ import poly as pm
 pm.poly.mv = False
 po = False # matrix contains polynomial entries
 
-# debug = False
-debug = True
+debug = False
+# debug = True
 
 fme = None
 # 2, 2 # show formula for this matrix element
@@ -124,7 +124,9 @@ u          undo
   M0 = deepcopy(M)
   if vb=='r':
     rr = int(cmd[0])
-    if len(cmd)>2: x = f.Fraction(cmd[1])
+    if len(cmd)>2:
+      if po: x = pm.str2rat(cmd[1])
+      else: x = f.Fraction(cmd[1])
     else: x = 1
     ro = int(cmd[-1])
     print(f'Replace row {rr} with {x} x row {ro}')
@@ -134,7 +136,10 @@ u          undo
     #     if len(xs): x = int(xs)
     #     else: x = 1
     #     print(rr, ro, x)
-    for c in range(n): M[rr][c] += x*M[ro][c]
+    for c in range(n):
+      if isinstance(M[rr][c],int) and po: M[rr][c] = pm.poly(M[rr][c]) + x*M[ro][c]
+      else: M[rr][c] += x*M[ro][c]
+#     for c in range(n): M[rr][c] = M[rr][c] + x*M[ro][c]
     if fme:
       if rr==fme[0]: p += x*pt(ro,fme[1])
 #       elif ro==fme[0]: p += x*pt(ro,fme[1])

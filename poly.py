@@ -16,19 +16,24 @@ class poly:
 
   # Polynomial is stored as list of dicts (factors)
   # dict: keys tuple of exponents val coefficient
-  # **last exponent in tuple must be non-zero (except for 0,)**
+  # **last exponent in tuple must be non-zero (NO 0, !!)**
 
   def __init__(s, p={}):
     '''Defaults to zero polynomial
     for the moment we construct only from single factor
     list construction of single factor is deprecated -- please use dict for each factor'''
     # Can also construct from list of lists (coef, exp0, exp1, ...) for the moment
+    # p is a single factor here!  Notation is confusing!! (1aug022)
 
     if debug: print(f'poly constructor: type={type(p)} val=[{p}]')
-    if isinstance(p, dict): s.p = [p]
+    if isinstance(p, dict):
+#       if p
+      s.p = [p]
     elif isinstance(p,(list,tuple)): #DEPRECATED single factor list construction
       s.p = [{}]
       for t in p: s.p[0][tuple(t[1:])] = t[0]
+    elif isinstance(p,int): # WARNING: promoting int to poly.  Is this what I want?
+      s.p = [{():p}]
     else: u.die('please construct poly with dict or list of lists:' + str(p))
 
   # def __del__(s): print('destroying poly instance with', len(s.p), 'terms...')
@@ -106,6 +111,7 @@ class poly:
 
 
   def mul(s,o):
+    print(type(o), o)
     # Don't want to mess with changing dict in place
     p = {}
     for elt,cl in s.p.items():
@@ -136,11 +142,13 @@ class poly:
     return s
 
 
-  def __iadd__(s, o): # +=
-#     print(f'adding {o} to {s}')
+  def add(s, o):
+    if debug: print(f'poly.add: [{type(s)}={s}] + [{type(o)}={o}]')
+    if len(s.p)>1: u.die('need to multiply out factors of poly')
     if isinstance(o,int):
 #       if s.p[0][1] != 0: u.die("first term isn't constant?")
-      s.p[()] += o # Is it possible to have an empty key?  Do we want an empty tuple anyway?
+      print('poly.add: fac1 =', s.p[0])
+      s.p[0][()] += o # Is it possible to have an empty key?  Do we want an empty tuple anyway?
     else:
       if not isinstance(o,poly):
         print(type(o))
@@ -152,16 +160,22 @@ class poly:
 #           pd[t[1]] += t[0]
 #           die('duplicate term found!')
 #         else: pd[t[1]] = t[0]
-      for e,c in o.p.items():
+      for e,c in o.p[0].items():
 #         if t[1] in pd: pd[t[1]] += t[0]
-        if e in s.p: s.p[e] += c
-        else: s.p[e] = c
-        if not s.p[e]: del s.p[e]
+        if e in s.p[0]: s.p[0][e] += c
+        else: s.p[0][e] = c
+        if not s.p[0][e]: del s.p[0][e]
 #       for e in sorted(pd): s.p.append([pd[e],e])
 #       for t in s.p:
 #         e = t[1]
 #         if e in pd: t[0] = pd[e]
     return s
+
+  def __iadd__(s, o): return s.add(o) # +=
+
+  def __add__(s,o): return s.add(o)
+#     if len(s.p)>1: die('trying to add to multi-factor poly')
+
 
   def plot(s, xs, f=None, m=None):
     '''xs = list of x values
@@ -233,10 +247,12 @@ def str2poly(st): # build this into poly constructor?
     if ex=='':
       if mode=='c': ex = '0'
       else: ex = '1'
-#     pl.append([int(co),int(ex)])
-    pd[int(ex),] = int(co)
+    #     pl.append([int(co),int(ex)])
+    ex = int(ex)
+    if ex: pd[ex,] = int(co)
+    else: pd[()] = int(co)
 
-  if len(tl)==1 and ex=='0': return int(co)
+  if len(tl)==1 and ex==0: return int(co)
   return poly(pd)
 
 
