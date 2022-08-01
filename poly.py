@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import scipy.special as ss # binomial coefficients
 # import AlgManip.util as u
-# from . import util
-# from .util import *
 import util as u
 
 # debug = True
@@ -12,42 +10,46 @@ class poly:
   'polynomial with integer coefficients'
   sym = 'q' # name of variable(s)
   mv = None # multi-variable polynomials
-  # (This is a property of a family of polynomials, not a single polynomial.)
-  # It is safest for the user to set this attribute value manually, but it can
+  # (These are properties of a family of polynomials, not a single polynomial.)
+  # It is safest for the user to set these attributes manually, but it can
   # probably be deduced from context if not?
   # False ==> never check if multi-variable
 
-  # store as dict: keys tuple of exponents val coefficient
-  # **last exponent must be non-zero**
+  # Polynomial is stored as list of dicts (factors)
+  # dict: keys tuple of exponents val coefficient
+  # **last exponent in tuple must be non-zero (except for 0,)**
 
   def __init__(s, p={}):
-    'Defaults to zero polynomial'
-    # Can also construct from list of lists (coef, exp0, exp1, ...) (deprecate?)
+    '''Defaults to zero polynomial
+    for the moment we construct only from single factor
+    list construction of single factor is deprecated -- please use dict for each factor'''
+    # Can also construct from list of lists (coef, exp0, exp1, ...) for the moment
 
     if debug: print(f'poly constructor: type={type(p)} val=[{p}]')
-    if isinstance(p, dict): s.p = p
-    elif isinstance(p,(list,tuple)): # deprecate this?
-      s.p = {}
-      for t in p: s.p[tuple(t[1:])] = t[0]
+    if isinstance(p, dict): s.p = [p]
+    elif isinstance(p,(list,tuple)): #DEPRECATED single factor list construction
+      s.p = [{}]
+      for t in p: s.p[0][tuple(t[1:])] = t[0]
     else: u.die('please construct poly with dict or list of lists:' + str(p))
 
   # def __del__(s): print('destroying poly instance with', len(s.p), 'terms...')
   # deconstructors do not have to be explicitly called in Python!
 
-  def __str__(s): # convert to pretty string
+  def __str__(sf): # convert to pretty string
     # Check multi-variable status
     if poly.mv==None:
-      for e in s.p:
-        if len(e)>1:
-          poly.mv = True
-          break
+      for f in sf.p:
+        for e in f:
+          if len(e)>1:
+            poly.mv = True
+            break
 #       else: poly.mv = False -- need to recheck every time
 
     # True : write using multi-variable assumption
     # False : write using single variable assumption
     # None : must assume multi-variable
 
-    retval = ''
+    # 'Global' Settings
     sp = '' # space between terms
     if u.gnuplot:
       msm = '*'
@@ -55,45 +57,51 @@ class poly:
     else:
       msm = ' ' # multiply symbol
       esm = '^' # exponent symbol
-    for ext,co in sorted(s.p.items()):
-      if debug: print(f'co={co} ext=', ext)
 
-      # compute exponent string
-      es = '' # exponent string
-      esp = '' # space between factors
-#       if poly.mv:
-      for i, ex in enumerate(ext):
-        if debug: print(f'var {i} ex {ex} esp [{esp}]')
-        # get variable name
-        if poly.mv==False: s = poly.sym
-        else: s = f'{poly.sym}{i}'
+    retval = ''
+    for fd in sf.p:
+      fs = ''
+      for ext,co in sorted(fd.items()):
+        if debug: print(f'co={co} ext=', ext)
 
-        if ex==0: continue
-        elif ex==1: es += esp+s
-        else: es += esp+f'{s}{esm}{ex}'
-        esp = ' '
-#       else: es = str(ext)
+        # compute exponent string
+        es = '' # exponent string
+        esp = '' # space between factors
+  #       if poly.mv:
+        for i, ex in enumerate(ext):
+          if debug: print(f'var {i} ex {ex} esp [{esp}]')
+          # get variable name
+          if poly.mv==False: sym = poly.sym
+          else: sym = f'{poly.sym}{i}'
 
-      # compute coefficient string
-      if co<-1:
-        cs = f'- {-co}'
-        if es: cs += msm
-      elif co==-1:
-        cs = '- '
-        if es=='': cs += '1'
-      elif co==1:
-        cs = '+ '
-        if not es: cs += '1'
-      else:
-        cs = f'+ {co}' #+msm
-        if es: cs += msm
-      if not co: continue
+          if ex==0: continue
+          elif ex==1: es += esp+sym
+          else: es += esp+f'{sym}{esm}{ex}'
+          esp = ' '
+  #       else: es = str(ext)
 
-      if debug: print(f'sp=[{sp}] cs=[{cs}] es=[{es}]')
-      retval += sp+cs+es
-      sp = ' '
-    if retval=='': retval = '0'
-    return retval
+        # compute coefficient string
+        if co<-1:
+          cs = f'- {-co}'
+          if es: cs += msm
+        elif co==-1:
+          cs = '- '
+          if es=='': cs += '1'
+        elif co==1:
+          cs = '+ '
+          if not es: cs += '1'
+        else:
+          cs = f'+ {co}' #+msm
+          if es: cs += msm
+        if not co: continue
+
+        if debug: print(f'sp=[{sp}] cs=[{cs}] es=[{es}]')
+        fs += sp+cs+es
+        sp = ' '
+      if fs=='': return '0'
+      if len(sf.p)>1: retval += f'({fs})'
+      else: return fs
+      return retval
 
 
   def mul(s,o):
@@ -113,7 +121,8 @@ class poly:
 
   
   def __imul__(s,o): # *=
-    s.p = s.mul(o)
+#     s.p = s.mul(o)
+    s.p.append(o)
     return s
 
   def __mul__(s,o): return poly(s.mul(o)) # poly * o
