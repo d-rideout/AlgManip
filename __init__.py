@@ -1,6 +1,6 @@
 print('Importing AlgManip python package module')
 
-import sys
+import sys # Anybody can access this via AlgManip.sys
 
 # print(sys.path)
 sys.path.insert(1,'AlgManip')
