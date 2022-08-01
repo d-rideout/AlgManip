@@ -5,6 +5,9 @@ from sys import argv
 from copy import deepcopy
 import fractions as f # docs.python.org/3/library/fractions.html
 import poly as pm
+pm.poly.sym = 'l'
+pm.poly.mv = False
+po = False # matrix contains polynomial entries
 
 debug = False
 fme = None
@@ -18,7 +21,10 @@ def prm(M):
   print()
   for r in M:
     print('[ ', end='')
-    for c in r: print('%3s' % c, end=' ')
+    if po:
+      for c in r: print(f'({c})', end=' ')
+    else:
+      for c in r: print('%3s' % c, end=' ')
     print(']')
   if fme: print(p)
 
@@ -38,44 +44,52 @@ Put , or + after last element of all but the last row''')
   exit()
 ri = 0 # row index
 for x in argv[1:]:
+  if 'l' in x: po = True
   if debug: print(f'[{x}]')
   if x[-1]==',' or x[-1]=='+':
     x = x[:-1]
-    M[ri].append(f.Fraction(x))
+#     M[ri].append(f.Fraction(x))
+    M[ri].append(x)
     ri += 1
     M.append([])
-  else: M[ri].append(f.Fraction(x))
+  else: M[ri].append(x) # M[ri].append(f.Fraction(x))
 
 m = len(M)
 n = len(M[0])
 print(f'{m} x {n} matrix')
 
-o2c = list(range(m)) # permutation map from original row indices to the current ones
-c2o = list(range(m)) # inverse of o2c
-# All indices start at 0 internally, but 1 from user's perspective.
-nswaps = 0
+# Convert matrix elements into algebraic types
+for ri in range(m):
+  for ci in range(n):
+    if po: M[ri][ci] = pm.str2poly(M[ri][ci])
+    else: M[ri][ci] = f.Fraction(M[ri][ci])
+
+# o2c = list(range(m)) # permutation map from original row indices to the current ones
+# c2o = list(range(m)) # inverse of o2c
+# # All indices start at 0 internally, but 1 from user's perspective.
+# nswaps = 0
 
 # Polynomial wrapping
-if fme:
-  def pi(i,j):
-    "map from matrix indices to variable index"
-    global n
-    return n*i + j
-
-  def pt(i,j): # polynomial term
-    "return polynomial of one matrix element?"
-    print(f'pt(): requested poly of matrix elt {i},{j}')
-    return pm.poly({tuple([0]*pi(i,j)+[1]):1})
-#     maybe construct from dict is simpler
-#     el.append(1)
-#     print(el)
-#     return pm.poly()
-
-  vn = [] # variable names
-  for r in range(m):
-    for c in range(n): vn.append(pi(r,c))
-
-  p = pt(fme[0],fme[1])
+# if fme:
+#   def pi(i,j):
+#     "map from matrix indices to variable index"
+#     global n
+#     return n*i + j
+#
+#   def pt(i,j): # polynomial term
+#     "return polynomial of one matrix element?"
+#     print(f'pt(): requested poly of matrix elt {i},{j}')
+#     return pm.poly({tuple([0]*pi(i,j)+[1]):1})
+# #     maybe construct from dict is simpler
+# #     el.append(1)
+# #     print(el)
+# #     return pm.poly()
+#
+#   vn = [] # variable names
+#   for r in range(m):
+#     for c in range(n): vn.append(pi(r,c))
+#
+#   p = pt(fme[0],fme[1])
     
 while 1:
   prm(M)

@@ -24,6 +24,7 @@ class poly:
     'Defaults to zero polynomial'
     # Can also construct from list of lists (coef, exp0, exp1, ...) (deprecate?)
 
+    if debug: print(f'poly constructor: type={type(p)} val=[{p}]')
     if isinstance(p, dict): s.p = p
     elif isinstance(p,(list,tuple)): # deprecate this?
       s.p = {}
@@ -60,6 +61,7 @@ class poly:
       # compute exponent string
       es = '' # exponent string
       esp = '' # space between factors
+#       if poly.mv:
       for i, ex in enumerate(ext):
         if debug: print(f'var {i} ex {ex} esp [{esp}]')
         # get variable name
@@ -70,12 +72,15 @@ class poly:
         elif ex==1: es += esp+s
         else: es += esp+f'{s}{esm}{ex}'
         esp = ' '
+#       else: es = str(ext)
 
       # compute coefficient string
       if co<-1:
         cs = f'- {-co}'
         if es: cs += msm
-      elif co==-1: cs = '- '
+      elif co==-1:
+        cs = '- '
+        if es=='': cs += '1'
       elif co==1:
         cs = '+ '
         if not es: cs += '1'
@@ -176,32 +181,36 @@ def omqn(n):
   return poly(rv)
 
 
-def str2poly(st):
-  '''convert string output of poly (__str__ method) into poly
-  (assuming non-gnuplot string)'''
+def str2poly(st): # build this into poly constructor?
+  '''convert string into poly'''
+  # output of poly (__str__ method) into poly
+  #  (assuming non-gnuplot string)'''
   # (using brute-force (non-regex) approach 'for fun'...)
+  if debug: print(f'str2poly [{st}]')
 
   # convert input string st to list of terms
   tl = []
-  t = None
+  tm = '' # term
   for c in st:
+    if debug: print(c, end='')
     if c=='+' or c=='-':
-#       print(c, end='')
-      if t: tl.append(t)
-      t = c
+      if tm: tl.append(tm)
+      tm = c
     elif c==' ': continue
-    else: t += c
+    else: tm += c
+  tl.append(tm) # grab last term
 #   print(tl)
 
   # parse terms
-  pl = []
+  pd = {}
   for t in tl:
+    if debug: print(f'parsing term [{t}]')
     co = ''
     ex = ''
     mode = 'c'
     for c in t:
       if c=='+' or c=='^': continue
-      if c==poly.sym: # 'q':
+      if c==poly.sym:
         mode = 'e'
         continue
       if mode=='c': co += c
@@ -211,6 +220,15 @@ def str2poly(st):
     if ex=='':
       if mode=='c': ex = '0'
       else: ex = '1'
-    pl.append([int(co),int(ex)])
+#     pl.append([int(co),int(ex)])
+    pd[int(ex),] = int(co)
 
-  return poly(pl)
+  return poly(pd)
+
+
+class ratFunc(poly):
+  'rational function (ratio of polynomials)'
+
+  def __init__(s, pn, pd):
+    'numerator and denominator can be polys or argument to poly constructor'
+    print(type(pn), isinstance(pn,poly))
