@@ -3,8 +3,7 @@ import scipy.special as ss # binomial coefficients
 # import AlgManip.util as u
 import util as u
 
-# debug = True
-debug = False
+debug = 0 # 2 max verbosity
 
 class poly:
   'polynomial with integer coefficients'
@@ -59,17 +58,19 @@ class poly:
       esm = '^' # exponent symbol
 
     retval = ''
+    if debug: print(len(sf.p), 'factors:', sf.p)
     for fd in sf.p:
       fs = ''
+      if debug: print('fac dict:', fd)
       for ext,co in sorted(fd.items()):
-        if debug: print(f'co={co} ext=', ext)
+        if debug>1: print(f'co={co} ext=', ext)
 
         # compute exponent string
         es = '' # exponent string
         esp = '' # space between factors
   #       if poly.mv:
         for i, ex in enumerate(ext):
-          if debug: print(f'var {i} ex {ex} esp [{esp}]')
+          if debug>1: print(f'var {i} ex {ex} esp [{esp}]')
           # get variable name
           if poly.mv==False: sym = poly.sym
           else: sym = f'{poly.sym}{i}'
@@ -95,13 +96,13 @@ class poly:
           if es: cs += msm
         if not co: continue
 
-        if debug: print(f'sp=[{sp}] cs=[{cs}] es=[{es}]')
+        if debug>1: print(f'sp=[{sp}] cs=[{cs}] es=[{es}]')
         fs += sp+cs+es
         sp = ' '
       if fs=='': return '0'
       if len(sf.p)>1: retval += f'({fs})'
       else: return fs
-      return retval
+    return retval
 
 
   def mul(s,o):
@@ -122,14 +123,16 @@ class poly:
   
   def __imul__(s,o): # *=
 #     s.p = s.mul(o)
-    s.p.append(o)
+    if isinstance(o,int): s.__rmul__(o) # write s = o * s instead?
+    else: s.p.append(o)
     return s
 
   def __mul__(s,o): return poly(s.mul(o)) # poly * o
 
   def __rmul__(s, i): # i * poly
+    "multiplies first factor by integer"
 #     print(f'multiplying {i} times {s}')
-    for e in s.p: s.p[e] *= i
+    for e in s.p[0]: s.p[0][e] *= i
     return s
 
 
@@ -191,7 +194,8 @@ def omqn(n):
 
 
 def str2poly(st): # build this into poly constructor?
-  '''convert string into poly'''
+  '''convert string into poly
+  returns int if possible'''
   # output of poly (__str__ method) into poly
   #  (assuming non-gnuplot string)'''
   # (using brute-force (non-regex) approach 'for fun'...)
@@ -232,11 +236,13 @@ def str2poly(st): # build this into poly constructor?
 #     pl.append([int(co),int(ex)])
     pd[int(ex),] = int(co)
 
+  if len(tl)==1 and ex=='0': return int(co)
   return poly(pd)
 
 
 def str2rat(st): # build this into ratFunc constructor?
-  'convert string into ratFunc'
+  '''convert string into ratFunc
+  returns simplest possible object (can be poly or int)'''
   # ignore () for the moment and assume simple format
   p = ''
   n = None
@@ -246,14 +252,17 @@ def str2rat(st): # build this into ratFunc constructor?
       p = ''
     else: p += c
   if n: return ratFunc(str2poly(n),str2poly(p))
-  else: return ratFunc(str2poly(p),poly({(0,):1}))
+  else:
+#     if ...
+    return str2poly(p) #poly({(0,):1}))
+#   else: return ratFunc(str2poly(p),1) #poly({(0,):1}))
 
 
 class ratFunc(poly):
   'rational function (ratio of polynomials)'
 
   def __init__(s, pn, pd):
-    'numerator and denominator can be polys or argument to poly constructor'
+    'numerator and denominator can be polys or argument to poly constructor ints'
     #     print(type(pn), isinstance(pn,poly))
     s.n = pn
     s.d = pd
