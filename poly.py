@@ -27,15 +27,12 @@ class poly:
     # p is a single factor here!  Notation is confusing!! (1aug022)
 
     if debug: print(f'poly constructor: type={type(p)} val=[{p}]')
-    if isinstance(p, dict):
-#       if p
-      s.p = [p]
+    if isinstance(p, dict): s.p = [p] # single factor in dict
     elif isinstance(p,(list,tuple)): #DEPRECATED single factor list construction
       s.p = [{}]
       for t in p: s.p[0][tuple(t[1:])] = t[0]
-    elif isinstance(p,int): # WARNING: promoting int to poly.  Is this what I want?
-      s.p = [{():p}]
-    else: u.die('please construct poly with dict or list of lists:' + str(p))
+    elif isinstance(p,int): s.p = [{():p}] # WARNING: promoting int to poly.  Is this what I want?
+    else: u.die('Please construct poly with dict or list of lists:' + str(p))
 
   # def __del__(s): print('destroying poly instance with', len(s.p), 'terms...')
   # deconstructors do not have to be explicitly called in Python!
@@ -65,7 +62,7 @@ class poly:
 
     retval = ''
     if debug: print(len(sf.p), 'factors:', sf.p)
-    for fd in sf.p:
+    for fd in sf.p: # loop over factor dicts
       fs = ''
       if debug: print('fac dict:', fd)
       for ext,co in sorted(fd.items()):
@@ -111,9 +108,10 @@ class poly:
     return retval
 
 
-  def mul(s,o):
+  def expand(s,o):
+    'expand out factors; returns dict of single factor'
+    print('WARNING: poly.expand is untested')
     print(type(o), o)
-    # Don't want to mess with changing dict in place
     p = {}
     for elt,cl in s.p.items():
       for ert,cr in o.p.items():
@@ -127,20 +125,40 @@ class poly:
     return p
 #     return poly(p) can i just pass the dict?
 
-  
   def __imul__(s,o): # *=
-#     s.p = s.mul(o)
-    if isinstance(o,int): s.__rmul__(o) # write s = o * s instead?
+    if isinstance(o,int):
+      for e in s.p[0]: s.p[0][e] *= o
+    elif isinstance(o,ratFunc): # write this here??
+      num = s.p + o.n
+      # cancel factors
+      for ni,nf in enumerate(num):
+        for di,df in enumerate(o.d):
+          if nf==df:
+            num.pop(ni)
+            o.d.pop(di)
+      if len(o.d): return ??? I don't think this can work.  s is an instance of poly, but it needs to become an instance of ratFunc.
+I guess poly's have to give way to ratFunc's.
+
+In world where division by polynomials happens, everything has to be a ratFunc
     else: s.p.append(o)
     return s
 
   def __mul__(s,o):
-    print(f'poly mul called on {type(s)}[{s}] * {type(o)}[{o}]')
-    return poly(s.mul(o)) # poly * o
+    if debug: print(f'poly mul called on {type(s)}[{s}] * {type(o)}[{o}]')
+    pr = copy.deepcopy(s)
+    if isinstance(o,int):
+      for e in pr.p[0]: pr.p[0][e] *= o
+    else:
+      pr.p += o.p # list + is concatenation
+#       pr.p.append(o.p)
+      print(f'poly mul returning {pr}')
+    return pr
+#     return poly(s.mul(o)) # poly * o
 
   def __rmul__(s, i): # i * poly
     "multiplies first factor by integer"
-    print(f'poly rmul called on {type(s)}[{s}] * {type(i)}[{i}]')
+    if debug: print(f'poly rmul called on {type(s)}[{s}] * {type(i)}[{i}]')
+    if not isinstance(i,int): die('rmul assumes poly * int')
     # This operation should not change s!  Only *= should do such a thing.
     pr = copy.deepcopy(s)
     for e in pr.p[0]: pr.p[0][e] *= i
@@ -183,7 +201,9 @@ class poly:
   # This seems wrong.  Look at mul et al.
 
   def __add__(s,o):
-    print(f'poly add called on {type(s)}[{s}] + {type(o)}[{o}]')
+    if debug:
+      print(f'poly add called on {type(s)} + {type(o)}')
+      print(f'   [{s}] + [{o}]')
     return poly(s.add(o))
 #     if len(s.p)>1: die('trying to add to multi-factor poly')
 
@@ -290,9 +310,16 @@ class ratFunc(poly):
 
   def __init__(s, pn, pd):
     'numerator and denominator can be polys or argument to poly constructor ints'
+    # d = None ==> denominator = 1
     #     print(type(pn), isinstance(pn,poly))
     s.n = pn
     s.d = pd
 
   def __str__(s):
     return f'({s.n})/({s.d})'
+
+  def __mul__(s): die('rf mul')
+  def __imul__(s): die('rf imul')
+  def __rmul__(s): die('rf rmul')
+  def __add__(s): die('rf add')
+  def __iadd__(s): die('rf iadd')

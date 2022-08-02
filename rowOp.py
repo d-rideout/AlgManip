@@ -20,7 +20,7 @@ fme = None
            # AND DON'T FORGET THAT THE MULTIPLIERS IN THE ROW XFORMS ARE THEMSELVES FUNCTIONS OF MATRIX ELEMENTS!!
 
 def prm(M):
-  print()
+  print('\nM=')
   for r in M:
     print('[ ', end='')
     if po:
@@ -29,14 +29,14 @@ def prm(M):
       for c in r: print('%3s' % c, end=' ')
     print(']')
 #   if fme: print(p)
-  print()
-  for r in M:
-    print('[ ', end='')
-    if po:
-      for c in r: print(f'({id(c)})', end=' ')
-    else:
-      for c in r: print('%3s' % c, end=' ')
-    print(']')
+#   print()
+#   for r in M:
+#     print('[ ', end='')
+#     if po:
+#       for c in r: print(f'({id(c)})', end=' ')
+#     else:
+#       for c in r: print('%3s' % c, end=' ')
+#     print(']')
 
 
 # Store matrix as list of rows
@@ -145,6 +145,7 @@ u          undo
     #     else: x = 1
     #     print(rr, ro, x)
     for c in range(n):
+      if debug: print('col', c)
       if isinstance(M[rr][c],int) and po:
         M[rr][c] = pm.poly(M[rr][c]) + x*M[ro][c]
         print(type(M[rr][c]), f'M{c} = M') # some mutable copy issue here?????
