@@ -28,7 +28,15 @@ def prm(M):
     else:
       for c in r: print('%3s' % c, end=' ')
     print(']')
-  if fme: print(p)
+#   if fme: print(p)
+  print()
+  for r in M:
+    print('[ ', end='')
+    if po:
+      for c in r: print(f'({id(c)})', end=' ')
+    else:
+      for c in r: print('%3s' % c, end=' ')
+    print(']')
 
 
 # Store matrix as list of rows
@@ -137,8 +145,12 @@ u          undo
     #     else: x = 1
     #     print(rr, ro, x)
     for c in range(n):
-      if isinstance(M[rr][c],int) and po: M[rr][c] = pm.poly(M[rr][c]) + x*M[ro][c]
-      else: M[rr][c] += x*M[ro][c]
+      if isinstance(M[rr][c],int) and po:
+        M[rr][c] = pm.poly(M[rr][c]) + x*M[ro][c]
+        print(type(M[rr][c]), f'M{c} = M') # some mutable copy issue here?????
+      else:
+        M[rr][c] += x*M[ro][c]
+        print(type(M[rr][c]), f'M{c} += M')
 #     for c in range(n): M[rr][c] = M[rr][c] + x*M[ro][c]
     if fme:
       if rr==fme[0]: p += x*pt(ro,fme[1])

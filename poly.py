@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import scipy.special as ss # binomial coefficients
+import copy
 # import AlgManip.util as u
 import util as u
 
@@ -133,22 +134,29 @@ class poly:
     else: s.p.append(o)
     return s
 
-  def __mul__(s,o): return poly(s.mul(o)) # poly * o
+  def __mul__(s,o):
+    print(f'poly mul called on {type(s)}[{s}] * {type(o)}[{o}]')
+    return poly(s.mul(o)) # poly * o
 
   def __rmul__(s, i): # i * poly
     "multiplies first factor by integer"
-#     print(f'multiplying {i} times {s}')
-    for e in s.p[0]: s.p[0][e] *= i
-    return s
+    print(f'poly rmul called on {type(s)}[{s}] * {type(i)}[{i}]')
+    # This operation should not change s!  Only *= should do such a thing.
+    pr = copy.deepcopy(s)
+    for e in pr.p[0]: pr.p[0][e] *= i
+    return pr
 
 
   def add(s, o):
     if debug: print(f'poly.add: [{type(s)}={s}] + [{type(o)}={o}]')
     if len(s.p)>1: u.die('need to multiply out factors of poly')
+    f = copy.deepcopy(s.p[0]) # WARNING: Probably should only be for iadd
+
+    print(type(s.p[0]), id(s.p[0]), '-->', type(f), id(f))
     if isinstance(o,int):
 #       if s.p[0][1] != 0: u.die("first term isn't constant?")
       print('poly.add: fac1 =', s.p[0])
-      s.p[0][()] += o # Is it possible to have an empty key?  Do we want an empty tuple anyway?
+      f[()] += o # Is it possible to have an empty key?  Do we want an empty tuple anyway?
     else:
       if not isinstance(o,poly):
         print(type(o))
@@ -162,18 +170,21 @@ class poly:
 #         else: pd[t[1]] = t[0]
       for e,c in o.p[0].items():
 #         if t[1] in pd: pd[t[1]] += t[0]
-        if e in s.p[0]: s.p[0][e] += c
-        else: s.p[0][e] = c
-        if not s.p[0][e]: del s.p[0][e]
+        if e in f: f[e] += c
+        else: f[e] = c
+        if not f[e]: del f[e]
 #       for e in sorted(pd): s.p.append([pd[e],e])
 #       for t in s.p:
 #         e = t[1]
 #         if e in pd: t[0] = pd[e]
-    return s
+    return f
 
-  def __iadd__(s, o): return s.add(o) # +=
+  def __iadd__(s, o): return poly(s.add(o)) # +=
+  # This seems wrong.  Look at mul et al.
 
-  def __add__(s,o): return s.add(o)
+  def __add__(s,o):
+    print(f'poly add called on {type(s)}[{s}] + {type(o)}[{o}]')
+    return poly(s.add(o))
 #     if len(s.p)>1: die('trying to add to multi-factor poly')
 
 
