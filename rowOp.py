@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-'Module which performs row operations.  Is this useful??'
+'Module which performs row operations'
 
 from sys import argv
 from copy import deepcopy
 import fractions as f # docs.python.org/3/library/fractions.html
 import poly as pm
-# pm.poly.sym = 'l'
 pm.poly.mv = False
 po = False # matrix contains polynomial entries
 
 debug = False
 # debug = True
 
-fme = None
+# fme = None
 # 2, 2 # show formula for this matrix element
            # assume row is not involved in row swaps for now
            # Please use internal indices for now
@@ -63,11 +62,10 @@ for x in argv[1:]:
   if debug: print(f'[{x}]')
   if x[-1]==',' or x[-1]=='+':
     x = x[:-1]
-#     M[ri].append(f.Fraction(x))
     M[ri].append(x)
     ri += 1
     M.append([])
-  else: M[ri].append(x) # M[ri].append(f.Fraction(x))
+  else: M[ri].append(x)
 
 m = len(M)
 n = len(M[0])
@@ -76,7 +74,7 @@ print(f'{m} x {n} matrix')
 # Convert matrix elements into algebraic types
 for ri in range(m):
   for ci in range(n):
-    if po: M[ri][ci] = pm.str2poly(M[ri][ci])
+    if po: M[ri][ci] = pm.str2rat(M[ri][ci])
     else: M[ri][ci] = f.Fraction(M[ri][ci])
 
 # o2c = list(range(m)) # permutation map from original row indices to the current ones
@@ -140,22 +138,18 @@ u          undo
     print(f'Replace row {rr} with {x} x row {ro}')
     rr -= 1
     ro -= 1
-    #     xs = cmd[3:-1]
-    #     if len(xs): x = int(xs)
-    #     else: x = 1
-    #     print(rr, ro, x)
     for c in range(n):
       if debug: print('col', c)
       if isinstance(M[rr][c],int) and po:
-        M[rr][c] = pm.poly(M[rr][c]) + x*M[ro][c]
-        print(type(M[rr][c]), f'M{c} = M') # some mutable copy issue here?????
+        M[rr][c] = pm.ratFunc(M[rr][c],None) + x*M[ro][c]
+        print(type(M[rr][c]), f'M{c} = M')
       else:
         M[rr][c] += x*M[ro][c]
         print(type(M[rr][c]), f'M{c} += M')
 #     for c in range(n): M[rr][c] = M[rr][c] + x*M[ro][c]
-    if fme:
-      if rr==fme[0]: p += x*pt(ro,fme[1])
-#       elif ro==fme[0]: p += x*pt(ro,fme[1])
+#     if fme:
+#       if rr==fme[0]: p += x*pt(ro,fme[1])
+# #       elif ro==fme[0]: p += x*pt(ro,fme[1])
 
 
   elif vb=='s':
@@ -172,11 +166,11 @@ u          undo
     r = M[r1]
     M[r1] = M[r2]
     M[r2] = r
-    if fme:
-      o2c[r1], o2c[r2] = o2c[r2], o2c[r1]
-      c2o[r1], c2o[r2] = c2o[r2], c2o[r1]
-      if nswaps: print('FIXME: Handling of row permutations is likely incorrect!')
-      nswaps += 1
+#     if fme:
+#       o2c[r1], o2c[r2] = o2c[r2], o2c[r1]
+#       c2o[r1], c2o[r2] = c2o[r2], c2o[r1]
+#       if nswaps: print('FIXME: Handling of row permutations is likely incorrect!')
+#       nswaps += 1
 
   else: print(f'invalid verb {vb}')
 

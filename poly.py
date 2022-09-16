@@ -128,18 +128,6 @@ class poly:
   def __imul__(s,o): # *=
     if isinstance(o,int):
       for e in s.p[0]: s.p[0][e] *= o
-    elif isinstance(o,ratFunc): # write this here??
-      num = s.p + o.n
-      # cancel factors
-      for ni,nf in enumerate(num):
-        for di,df in enumerate(o.d):
-          if nf==df:
-            num.pop(ni)
-            o.d.pop(di)
-      if len(o.d): return ??? I don't think this can work.  s is an instance of poly, but it needs to become an instance of ratFunc.
-I guess poly's have to give way to ratFunc's.
-
-In world where division by polynomials happens, everything has to be a ratFunc
     else: s.p.append(o)
     return s
 
@@ -283,13 +271,12 @@ def str2poly(st): # build this into poly constructor?
     if ex: pd[ex,] = int(co)
     else: pd[()] = int(co)
 
-  if len(tl)==1 and ex==0: return int(co)
+  if len(tl)==1 and ex==0: return [int(co)]
   return poly(pd)
 
 
 def str2rat(st): # build this into ratFunc constructor?
-  '''convert string into ratFunc
-  returns simplest possible object (can be poly or int)'''
+  '''convert string into ratFunc'''
   # ignore () for the moment and assume simple format
   p = ''
   n = None
@@ -298,11 +285,8 @@ def str2rat(st): # build this into ratFunc constructor?
       n = p
       p = ''
     else: p += c
-  if n: return ratFunc(str2poly(n),str2poly(p))
-  else:
-#     if ...
-    return str2poly(p) #poly({(0,):1}))
-#   else: return ratFunc(str2poly(p),1) #poly({(0,):1}))
+  if n: return ratFunc(str2poly(n), str2poly(p))
+  else: return ratFunc(str2poly(p), [])
 
 
 class ratFunc(poly):
@@ -310,16 +294,37 @@ class ratFunc(poly):
 
   def __init__(s, pn, pd):
     'numerator and denominator can be polys or argument to poly constructor ints'
-    # d = None ==> denominator = 1
+    # d = [] ==> denominator = 1
+#     # d = None ==> denominator = 1
     #     print(type(pn), isinstance(pn,poly))
     s.n = pn
     s.d = pd
 
   def __str__(s):
-    return f'({s.n})/({s.d})'
+    if s.d: return f'({s.n})/({s.d})'
+    else: return str(s.n)
 
   def __mul__(s): die('rf mul')
-  def __imul__(s): die('rf imul')
   def __rmul__(s): die('rf rmul')
   def __add__(s): die('rf add')
   def __iadd__(s): die('rf iadd')
+
+  def __imul__(s,o):
+    print(f'ratFunc.imul: o = {type(o)}[{o}]')
+    print(f'  s.n = {type(s.n)}[{s.n}]')
+    print(f'  s.d = {type(s.d)}[{s.d}]')
+    print(f'  o.n = {type(o.n)}[{o.n}]')
+    print(f'  o.d = {type(o.d)}[{o.d}]')
+    num = s.n + o.n
+    den = s.d + o.d
+    # cancel factors
+    for ni,nf in enumerate(num):
+      for di,df in enumerate(den):
+        if nf==df:
+          num.pop(ni)
+          den.pop(di)
+    s.n = num
+#     if len(den):
+    s.d = den
+#     else: s.d = None
+    return s
