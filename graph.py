@@ -2,6 +2,13 @@
 'Fast graph module' # (drop the acyclic assumption?)
 
 def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
+#   print('i j bit_num')
+#   for j in range(1,n):
+#     for i in range(j): print(i,j, gm.i2bit(i,j))
+# #   print('bn i  j')
+# #   for i in range(1<<nc2): print(i, bit2i(i))
+# #   exit()
+#   print()
 
 def popcount(n): return bin(n).count('1')
 # www.valuedlessons.com/2009/01/popcount-in-python-with-benchmarks.html
@@ -32,11 +39,10 @@ class graph:
 # u = (1<<i2bit(n-2,n-1)+1)-1 complete graph / chain (?)
 
 
-# if debug:
-#   print('i j bit_num')
-#   for j in range(1,n):
-#     for i in range(j): print(i,j, gm.i2bit(i,j))
-# #   print('bn i  j')
-# #   for i in range(1<<nc2): print(i, bit2i(i))
-# #   exit()
-#   print()
+# Random Graphs via 'Generalized Percolation'
+# (aka 'CSG models', ala Rideout & Sorkin 1999)
+# See also Bucicovschi & Meyer & Rideout 2022???
+
+class tn:
+  'sequence (t_n \geq 0)'
+  def __getitem__(s,i): return f'index {i}'
