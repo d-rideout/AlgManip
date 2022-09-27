@@ -74,7 +74,7 @@ class graph:
         fp.write('\n')
       else: fp.write(f'{x};\n') # PERF: sometimes redundant
     fp.write('}\n')
-    print(f'dot -Tpdf -o {fr}.pdf {fr}.dot')
+    print(f'time dot -Tpdf -o {fr}.pdf {fr}.dot')
   def transClose(s):
     'Compute transitive closure of graph interpreted as a dag'
     if graph.size != 'm':
@@ -103,12 +103,18 @@ class graph:
 class tn:
   '''sequence (t_n \geq 0)
   const\tt_n = 1\t\t(default)
-  harm\tt_n = 1/n'''
+  harm\tt_n = 1/(n+1)
+  quad\tt_n = 1/(n^2+1)'''
   # n should probably be passed to the constructor instead of to sample()?
-  def __init__(s,t=None):
-    if t: u.die('tn constructor: Please use default (no arguments) for now')
-    s.type = t
-  def __getitem__(s,i): return 1 # f'index {i}'
+  def __init__(s,t='const'):
+#     if t: u.die('tn constructor: Please use default (no arguments) for now')
+    s.type = t # store type as string?
+    if t=='harm': s.df = lambda n: n+1
+    elif t=='const': s.df = lambda n: 1
+    elif t=='quad': s.df = lambda n: n*n+1
+    else: print(f'sequence {t} not implemented yet')
+  def __getitem__(s,i): return 1/s.df(i) # f'index {i}'
+  # Will this ever be used? (27sep022)
   def sample(s,n):
     "n is label == num of 'existing' nodes"
     # PERF: Am I going to be called many times, for each n??
@@ -116,7 +122,8 @@ class tn:
     # PERF: How to start from middle? (16sep022)
     # I leave it to the random.choices() function for now (26sep022)
 #     totW = 2**n # assuming t_n = 1 for now (16sep022)
-    return rm.choices(range(n+1), [ss.comb(n,i, exact=True) for i in range(n+1)])[0]
+    return rm.choices(range(n+1),
+                      [ss.comb(n,i, exact=True)/s.df(i) for i in range(n+1)])[0]
     # just use tn as its own iterator or sequence type to random.choices()  say
     # which passes cumulative weights
     # does anyone really need tns directly?
