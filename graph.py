@@ -13,7 +13,8 @@ def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
 # #   exit()
 #   print()
 
-def popcount(n): return bin(n).count('1')
+def popcount(n): return b.bit_count() #!!
+#bin(n).count('1')
 # www.valuedlessons.com/2009/01/popcount-in-python-with-benchmarks.html
 # First comment suggests that this is not completely terrible??!
 # Python 3.10 has more native popcount?
@@ -39,14 +40,15 @@ def popcount(n): return bin(n).count('1')
 
 class graph:
   dag = False
-  lg = True
+  size = 'm'
+#   lg = True
   # Do I want to pass n each time, or make it global?
-  def __init__(s, n, gr):
+  def __init__(s, n=0, gr=[]):
     'gr can be an int for a small graph, or a list of ints for a large graph'
     s.n = n
     s.gr = gr
   def __str__(s): # cf pypi.org/project/diGraph ?
-    if graph.lg: return f'lg graph on {n} nodes'
+    if graph.size != 's': return f'med graph on {s.n} nodes'
     rv = ''
     spc = ''
     if dag: rn = '<'
@@ -57,7 +59,23 @@ class graph:
           rv += sp + f'{i}{rn}{j}'
           spc = ' '
     return rv
-
+  def writeDag(s, fr=None):
+    'write dag to .dot file for graphviz'
+    if s.size!='m':
+      print('graphviz output of non-medium graphs not implemented yet')
+      return
+    if not fr: fr = f'dag{s.n}' #.dot'
+    fp = open(fr+'.dot', 'w', newline='')
+    fp.write('digraph "{fr}" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
+    for x in range(s.n):
+      w = s.gr[x]
+      if w:
+        for b in range(w.bit_length()):
+          if 1<<b & w: fp.write(f'{b}->{x}; ')
+        fp.write('\n')
+      else: fp.write(f'{x};\n') # PERF: sometimes redundant
+    fp.write('}\n')
+    print(f'dot -Tpdf -o {fr}.pdf {fr}.dot')
 
 # u = (1<<i2bit(n-2,n-1)+1)-1 complete graph / chain (?)
 
@@ -65,12 +83,11 @@ class graph:
 # Random Graphs via 'Generalized Percolation'
 # (aka 'CSG models', ala Rideout & Sorkin 1999)
 # See also Bucicovschi & Meyer & Rideout 2022???
-
 class tn:
   '''sequence (t_n \geq 0)
   const\tt_n = 1\t\t(default)
   harm\tt_n = 1/n'''
-
+  # n should probably be passed to the constructor instead of to sample()?
   def __init__(s,t=None):
     if t: u.die('tn constructor: Please use default (no arguments) for now')
     s.type = t
