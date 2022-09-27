@@ -59,7 +59,7 @@ class graph:
           spc = ' '
     return rv
   def writeDag(s, fr=None):
-    'write dag to .dot file for graphviz'
+    'Write dag to .dot file for graphviz'
     if s.size!='m':
       print('graphviz output of non-medium graphs not implemented yet')
       return
@@ -76,14 +76,24 @@ class graph:
     fp.write('}\n')
     print(f'dot -Tpdf -o {fr}.pdf {fr}.dot')
   def transClose(s):
-    'compute transitive closure of graph interpreted as a dag'
+    'Compute transitive closure of graph interpreted as a dag'
     if graph.size != 'm':
       print("Transitive closure of non-medium graphs not implemented yet")
       return
     for j in range(2,s.n): # i < j
       for i in range(1,j):
         if 1<<i & s.gr[j]: s.gr[j] |= s.gr[i]
-
+  def transReduce(s):
+    '''Compute transitive reduction of graph interpreted as a dag
+    Be sure to compute transitive closure first, to get the correct answer!!'''
+    if graph.size != 'm':
+      print("Transitive reduction of non-medium graphs not implemented yet")
+      return
+    for j in range(s.n-1,1,-1): # i < j
+      for i in range(j-1, 0, -1):
+        try:
+          if 1<<i & s.gr[j]: s.gr[j] &= ~s.gr[i] # note that relation should be irreflexive
+        except IndexError: print('index error:', i,j)
 # u = (1<<i2bit(n-2,n-1)+1)-1 complete graph / chain (?)
 
 
