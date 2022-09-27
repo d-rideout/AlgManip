@@ -40,8 +40,7 @@ def popcount(n): return b.bit_count() #!!
 
 class graph:
   dag = False
-  size = 'm'
-#   lg = True
+  size = 'm' # make this an attribute of an instance?
   # Do I want to pass n each time, or make it global?
   def __init__(s, n=0, gr=[]):
     'gr can be an int for a small graph, or a list of ints for a large graph'
@@ -76,6 +75,14 @@ class graph:
       else: fp.write(f'{x};\n') # PERF: sometimes redundant
     fp.write('}\n')
     print(f'dot -Tpdf -o {fr}.pdf {fr}.dot')
+  def transClose(s):
+    'compute transitive closure of graph interpreted as a dag'
+    if graph.size != 'm':
+      print("Transitive closure of non-medium graphs not implemented yet")
+      return
+    for j in range(2,s.n): # i < j
+      for i in range(1,j):
+        if 1<<i & s.gr[j]: s.gr[j] |= s.gr[i]
 
 # u = (1<<i2bit(n-2,n-1)+1)-1 complete graph / chain (?)
 
