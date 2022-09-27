@@ -38,6 +38,10 @@ def popcount(n): return b.bit_count() #!!
 # I suppose the best way to answer such questions (besides digging into source
 # code) is to run experiments.  Any volunteers?
 
+# I am suspecting that all non-small graphs can be considered 'medium'!
+# There is no need for 'large' graphs.  Or maybe outside of a C implementation??
+# Parallel environment? (27sep022)
+
 class graph:
   dag = False
   size = 'm' # make this an attribute of an instance?
@@ -104,15 +108,18 @@ class tn:
   '''sequence (t_n \geq 0)
   const\tt_n = 1\t\t(default)
   harm\tt_n = 1/(n+1)
-  quad\tt_n = 1/(n^2+1)'''
+  quad\tt_n = 1/(n^2+1)
+  fac\tt_n = 1/n!'''
   # n should probably be passed to the constructor instead of to sample()?
+  # exact=False seems to lead to float overflows?!
   def __init__(s,t='const'):
 #     if t: u.die('tn constructor: Please use default (no arguments) for now')
     s.type = t # store type as string?
-    if t=='harm': s.df = lambda n: n+1
-    elif t=='const': s.df = lambda n: 1
+    if t=='const': s.df = lambda n: 1
+    elif t=='harm': s.df = lambda n: n+1
     elif t=='quad': s.df = lambda n: n*n+1
-    else: print(f'sequence {t} not implemented yet')
+    elif t=='fac': s.df = lambda n: ss.factorial(n, exact=True)
+    else: print(f'sequence {t} not recognized yet')
   def __getitem__(s,i): return 1/s.df(i) # f'index {i}'
   # Will this ever be used? (27sep022)
   def sample(s,n):
