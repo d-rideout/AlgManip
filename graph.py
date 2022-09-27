@@ -64,6 +64,7 @@ class graph:
     return rv
   def writeDag(s, fr=None):
     'Write dag to .dot file for graphviz'
+    # dag ==> digraph.  Separate method writeG() can output undirected graph
     if s.size!='m':
       print('graphviz output of non-medium graphs not implemented yet')
       return
@@ -109,28 +110,32 @@ class tn:
   const\tt_n = 1\t\t(default)
   harm\tt_n = 1/(n+1)
   quad\tt_n = 1/(n^2+1)
-  fac\tt_n = 1/n!'''
+  fac\tt_n = 1/n!
+  forest\tt_0=t_1 = 1, t_n = 0 n > 1'''
   # n should probably be passed to the constructor instead of to sample()?
   # exact=False seems to lead to float overflows?!
+  # But it is very slow for n \gtsim 2^10 -- need to write numerically stable approximations (27sep022)
   def __init__(s,t='const'):
 #     if t: u.die('tn constructor: Please use default (no arguments) for now')
-    s.type = t # store type as string?
     if t=='const': s.df = lambda n: 1
     elif t=='harm': s.df = lambda n: n+1
     elif t=='quad': s.df = lambda n: n*n+1
     elif t=='fac': s.df = lambda n: ss.factorial(n, exact=True)
+    elif t=='forest': t = None # prob Bad Idea...
     else: print(f'sequence {t} not recognized yet')
+    s.type = t # store type as string?
   def __getitem__(s,i): return 1/s.df(i) # f'index {i}'
   # Will this ever be used? (27sep022)
   def sample(s,n):
     "n is label == num of 'existing' nodes"
+    if s.type: return rm.choices(range(n+1),
+                      [ss.comb(n,i, exact=True)/s.df(i) for i in range(n+1)])[0]
+    else: return rm.choices(range(2), cum_weights=[1,n+1])[0] # forest
     # PERF: Am I going to be called many times, for each n??
     # I assume not for now. (16sep022)
     # PERF: How to start from middle? (16sep022)
     # I leave it to the random.choices() function for now (26sep022)
-#     totW = 2**n # assuming t_n = 1 for now (16sep022)
-    return rm.choices(range(n+1),
-                      [ss.comb(n,i, exact=True)/s.df(i) for i in range(n+1)])[0]
+    #     totW = 2**n # assuming t_n = 1 for now (16sep022)
     # just use tn as its own iterator or sequence type to random.choices()  say
     # which passes cumulative weights
     # does anyone really need tns directly?
