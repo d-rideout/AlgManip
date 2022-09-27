@@ -19,14 +19,34 @@ def popcount(n): return bin(n).count('1')
 # Python 3.10 has more native popcount?
 # Just use this for now and profile (12jul022)
 
+# What is a small graph?  oeis.org/A161680/list
+#  n nc2
+#  6  15
+#  8  28  seems safe
+# 11  55  maybe this is a good cutoff?
+# 14  91
+# 16 120  or this?
+# 23 253  or this??
+# 32 496
+# 45 990
+# What are the widest registers for integer instructions?  512 bit? 2048 bit???
+# How does python handle wide integers?
+# Note that a single memory access of a 'small graph' costs O(n^2) (reading through n^2 X's), while it is only O(1) for a 'large graph'.
+# (Of course what is X?  An int?  What does that mean in python?  A byte?
+#  A bit?  And this matters greatly for such tiny numbers.)
+# I suppose the best way to answer such questions (besides digging into source
+# code) is to run experiments.  Any volunteers?
 
 class graph:
   dag = False
+  lg = True
+  # Do I want to pass n each time, or make it global?
   def __init__(s, n, gr):
-    # Do I want to pass n each time, or make it global?
+    'gr can be an int for a small graph, or a list of ints for a large graph'
     s.n = n
     s.gr = gr
   def __str__(s): # cf pypi.org/project/diGraph ?
+    if graph.lg: return f'lg graph on {n} nodes'
     rv = ''
     spc = ''
     if dag: rn = '<'
