@@ -1,7 +1,7 @@
 mplsym = ('o', 'x', '+', 'v')
 gnuplot = False # True  # gnuplot style display
 
-def die(msg):
+def die(msg): # Rethink how to handle this with exceptions! (16sep022)
   print(msg)
   exit()
   
