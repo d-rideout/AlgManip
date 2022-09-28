@@ -53,7 +53,7 @@ class graph:
     s.n = n
     s.gr = gr
   def __str__(s): # cf pypi.org/project/diGraph ?
-    if graph.size != 's': return f'med graph on {s.n} nodes'
+    if graph.size != 's': return f'<med graph on {s.n} nodes>'
     rv = ''
     spc = ''
     if dag: rn = '<'
@@ -127,8 +127,10 @@ class tn:
     elif t=='quad': s.df = lambda n: fm.Fraction(n*n+1)
     elif t=='fac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True))
     elif t=='llfac':
-      s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True),
-                                   mm.ceil(mm.log(mm.log(n+2,2)+2,2)))
+      s.df = lambda n: fm.Fraction( ss.factorial(n, exact=True),
+                                   int( mm.log(mm.log(n+1,2)+1,2) +1.5 ) )
+#       s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True),
+#                                    mm.ceil(mm.log(mm.log(n+2,2)+2,2)))
     elif t=='efac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True), 2**n)
     elif t=='forest': t = None # prob Bad Idea...
     else: print(f'sequence {t} not recognized yet')
@@ -136,7 +138,8 @@ class tn:
   def __getitem__(s,i): return 1/s.df(i) # f'index {i}'
   # Will this ever be used? (27sep022)
   def sample(s,n, verb=False):
-    "n is label == num of 'existing' nodes"
+    '''Sample from 'cardinality distribution' defined by (tn) (and n)
+    n is label == num of 'existing' nodes'''
     if s.type:
       weights = [ss.comb(n,k, exact=True)/s.df(k) for k in range(n+1)]
       if verb: print([f'{x.numerator}/{x.denominator}' for x in weights])
