@@ -120,38 +120,57 @@ class tn:
   quad\tt_n = 1/(n^2+1)
   llfac\tt_n = ceil(log2(log2(n+2)+2))/n!
   fac\tt_n = 1/n!
+  mybin\tt_n = 0 for n>2
   forest\tt_0=t_1 = 1, t_n = 0 n > 1'''
   # n should probably be passed to the constructor instead of to sample()?
   # exact=False seems to lead to float overflows?!
   # But it is very slow for n \gtsim 2^10 -- need to write numerically stable approximations (27sep022)
-  def __init__(s,t='const'):
+  def __init__(s,ty='const'):
+    s.ts = None # for finite sequences
     # s.df is the *denominator* (function)
     # (Maybe this is too confusing now that I am using Fraction()s?)
-    if t=='const': s.df = lambda n: 1
-    elif t=='harm': s.df = lambda n: fm.Fraction(n+1)
-    elif t=='quad': s.df = lambda n: fm.Fraction(n*n+1)
-    elif t=='fac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True))
-    elif t=='llfac':
+    if ty=='const': s.df = lambda n: 1
+    elif ty=='harm': s.df = lambda n: fm.Fraction(n+1)
+    elif ty=='quad': s.df = lambda n: fm.Fraction(n*n+1)
+    elif ty=='fac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True))
+    elif ty=='llfac':
       s.df = lambda n: fm.Fraction( ss.factorial(n, exact=True),
                                    int( mm.log(mm.log(n+1,2)+1,2) +1.5 ) )
 #       s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True),
 #                                    mm.ceil(mm.log(mm.log(n+2,2)+2,2)))
-    elif t=='efac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True), 2**n)
-    elif t=='forest': t = None # prob Bad Idea...
-    else: print(f'sequence {t} not recognized yet')
-    s.type = t # store type as string?
-  def __getitem__(s,i): return 1/s.df(i) # f'index {i}'
+    elif ty=='efac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True), 2**n)
+    elif ty=='mybin': s.ts = (2,3,1) # NOTE: tn>0 will always be dominated by last entry!
+    elif ty=='forest': s.ts = (1,1)
+    else: print(f'sequence {ty} not recognized yet')
+    s.type = ty # store type as string?
+#     if ts:
+#       s.cum = []
+#       sum = 0
+#       for x in ts:
+#         sum += x
+#         s.cum.append(sum)
+#       print('cum:', s.cum)
+
+  def __getitem__(s,i):
+    print('WARNING: tn.__getitem__() is not maintained -- likely returning wrong result')
+    return 1/s.df(i) # f'index {i}'
   # Will this ever be used? (27sep022)
+  # Does anyone really need tns directly?
+
   def sample(s,n, verb=False):
     '''Sample from 'cardinality distribution' defined by (tn) (and n)
-    n is label == num of 'existing' nodes'''
-    if s.type:
+    n is label == cardinality of 'existing' nodes'''
+    if not s.ts:
       weights = [ss.comb(n,k, exact=True)/s.df(k) for k in range(n+1)]
       if verb: print([f'{x.numerator}/{x.denominator}' for x in weights])
       return rm.choices(range(n+1), weights)[0]
     else:
-      if verb: print([1,n])
-      return rm.choices(range(2), cum_weights=[1,n+1])[0] # forest
+      N = len(s.ts)
+      if n<N: N = n+1
+      weights = [ss.comb(n,k, exact=True)*s.ts[k] for k in range(N)]
+      if verb: print('weights:', weights)
+      return rm.choices(range(N), weights)[0]
+#       return rm.choices(range(2), cum_weights=[1,n+1])[0] # forest
     # PERF: Am I going to be called many times, for each n??
     # I assume not for now. (16sep022)
     # PERF: How to start from middle? (16sep022)
@@ -159,5 +178,3 @@ class tn:
     #     totW = 2**n # assuming t_n = 1 for now (16sep022)
     # just use tn as its own iterator or sequence type to random.choices()  say
     # which passes cumulative weights
-    # does anyone really need tns directly?
-#     return roll
