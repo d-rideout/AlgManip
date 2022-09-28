@@ -64,15 +64,18 @@ class graph:
           rv += sp + f'{i}{rn}{j}'
           spc = ' '
     return rv
-  def writeDag(s, fr=None):
-    'Write dag to .dot file for graphviz'
+
+  def writeDag(s, fnr=None, st=None):
+    '''Write dag to .dot file for graphviz
+    fnr = filename root
+    st = string to add to dot file : Please add '#' to beginning of comments!'''
     # dag ==> digraph.  Separate method writeG() can output undirected graph
     if s.size!='m':
       print('graphviz output of non-medium graphs not implemented yet')
       return
-    if not fr: fr = f'dag{s.n}' #.dot'
-    fp = open(fr+'.dot', 'w', newline='')
-    fp.write('digraph "{fr}" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
+    if not fnr: fnr = f'dag{s.n:04}' #.dot'
+    fp = open(fnr+'.dot', 'w', newline='')
+    fp.write('digraph "'+fnr+'" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
     for x in range(s.n):
       w = s.gr[x]
       if w:
@@ -80,8 +83,10 @@ class graph:
           if 1<<b & w: fp.write(f'{b}->{x}; ')
         fp.write('\n')
       else: fp.write(f'{x};\n') # PERF: sometimes redundant
+    if st: fp.write(st+'\n')
     fp.write('}\n')
-    print(f'time dot -Tpdf -o {fr}.pdf {fr}.dot')
+    print(f'time dot -Tpdf -o {fnr}.pdf {fnr}.dot')
+
   def transClose(s):
     'Compute transitive closure of graph interpreted as a dag'
     if graph.size != 'm':
