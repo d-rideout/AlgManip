@@ -2,6 +2,8 @@
 'Fast graph module' # (drop the acyclic assumption?)
 import scipy.special as ss # binomial coefficients
 import random as rm
+import fractions as fm
+import math as mm
 import util as u
 
 def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
@@ -106,31 +108,42 @@ class graph:
 # (aka 'CSG models', ala Rideout & Sorkin 1999)
 # See also Bucicovschi & Meyer & Rideout 2022???
 class tn:
-  '''sequence (t_n \geq 0)
+  '''sequence (t_n \geq 0) (in decreasing order of chainlikeness?)
   const\tt_n = 1\t\t(default)
+  efac\tt_n = 2^n/n!
   harm\tt_n = 1/(n+1)
   quad\tt_n = 1/(n^2+1)
+  llfac\tt_n = ceil(log2(log2(n+2)+2))/n!
   fac\tt_n = 1/n!
   forest\tt_0=t_1 = 1, t_n = 0 n > 1'''
   # n should probably be passed to the constructor instead of to sample()?
   # exact=False seems to lead to float overflows?!
   # But it is very slow for n \gtsim 2^10 -- need to write numerically stable approximations (27sep022)
   def __init__(s,t='const'):
-#     if t: u.die('tn constructor: Please use default (no arguments) for now')
+    # s.df is the *denominator* (function)
+    # (Maybe this is too confusing now that I am using Fraction()s?)
     if t=='const': s.df = lambda n: 1
-    elif t=='harm': s.df = lambda n: n+1
-    elif t=='quad': s.df = lambda n: n*n+1
-    elif t=='fac': s.df = lambda n: ss.factorial(n, exact=True)
+    elif t=='harm': s.df = lambda n: fm.Fraction(n+1)
+    elif t=='quad': s.df = lambda n: fm.Fraction(n*n+1)
+    elif t=='fac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True))
+    elif t=='llfac':
+      s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True),
+                                   mm.ceil(mm.log(mm.log(n+2,2)+2,2)))
+    elif t=='efac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True), 2**n)
     elif t=='forest': t = None # prob Bad Idea...
     else: print(f'sequence {t} not recognized yet')
     s.type = t # store type as string?
   def __getitem__(s,i): return 1/s.df(i) # f'index {i}'
   # Will this ever be used? (27sep022)
-  def sample(s,n):
+  def sample(s,n, verb=False):
     "n is label == num of 'existing' nodes"
-    if s.type: return rm.choices(range(n+1),
-                      [ss.comb(n,i, exact=True)/s.df(i) for i in range(n+1)])[0]
-    else: return rm.choices(range(2), cum_weights=[1,n+1])[0] # forest
+    if s.type:
+      weights = [ss.comb(n,k, exact=True)/s.df(k) for k in range(n+1)]
+      if verb: print([f'{x.numerator}/{x.denominator}' for x in weights])
+      return rm.choices(range(n+1), weights)[0]
+    else:
+      if verb: print([1,n])
+      return rm.choices(range(2), cum_weights=[1,n+1])[0] # forest
     # PERF: Am I going to be called many times, for each n??
     # I assume not for now. (16sep022)
     # PERF: How to start from middle? (16sep022)
