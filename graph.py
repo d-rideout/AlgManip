@@ -1,26 +1,20 @@
+'''Fast graph module
+
+(The vertices of the graph are labeled with values taken from a poset, which
+are almost always the natural numbers.  (Since the order intervals of this
+poset will always be finite, it is in fact a causal set, or causet.)
+The partial ordering of the labels can be used
+to induce a partial order on the vertices, and thus, after transitive
+closure, convert the graph into a causal set.)'''
+# [But how to handle spacelike vertices connected by an edge... ???
+# Just keep these as a second relation defined on the vertex set??]'''
 # 'Fast DAG (directed acyclic graph) module' # include all graphs?
-'Fast graph module' # (drop the acyclic assumption?)
+# (drop the acyclic assumption?)
 import scipy.special as ss # binomial coefficients
 import random as rm
 import fractions as fm
 import math as mm
 import util as u
-
-def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
-#   print('i j bit_num')
-#   for j in range(1,n):
-#     for i in range(j): print(i,j, gm.i2bit(i,j))
-# #   print('bn i  j')
-# #   for i in range(1<<nc2): print(i, bit2i(i))
-# #   exit()
-#   print()
-
-def popcount(n): return b.bit_count() #!!
-#bin(n).count('1')
-# www.valuedlessons.com/2009/01/popcount-in-python-with-benchmarks.html
-# First comment suggests that this is not completely terrible??!
-# Python 3.10 has more native popcount?
-# Just use this for now and profile (12jul022)
 
 # What is a small graph?  oeis.org/A161680/list
 #  n nc2
@@ -34,17 +28,30 @@ def popcount(n): return b.bit_count() #!!
 # 45 990
 # What are the widest registers for integer instructions?  512 bit? 2048 bit???
 # How does python handle wide integers?
-# Note that a single memory access of a 'small graph' costs O(n^2) (reading through n^2 X's), while it is only O(1) for a 'large graph'.
+# Note that a single memory access of a 'small graph' costs O(n^2)
+# (reading through n^2 X's), while it is only O(1) for a 'large graph'.
 # (Of course what is X?  An int?  What does that mean in python?  A byte?
 #  A bit?  And this matters greatly for such tiny numbers.)
 # I suppose the best way to answer such questions (besides digging into source
 # code) is to run experiments.  Any volunteers?
-
+#
 # I am suspecting that all non-small graphs can be considered 'medium'!
 # There is no need for 'large' graphs.  Or maybe outside of a C implementation??
 # Parallel environment? (27sep022)
 
 class graph:
+  '''Class attributes:
+  dag  : boolean, used for output currently
+  size : 'm|s|l' maybe, see above comments for some discussion
+
+  Instance attributes:
+  n  : number of vertices/notes
+  gr : graph as list (details depend on size above)
+
+  Class methods:
+  writeDag    : write dot file (just hard coding dag aspect for now (16nov022))
+  transClose  : assuming dag, add all relations/edges implied by transitivity
+  transReduce : assuming dag, remove all relations/edges implied by transitivity'''
   dag = False
   size = 'm' # make this an attribute of an instance?
   # Do I want to pass n each time, or make it global?
@@ -118,6 +125,7 @@ class tn:
   efac\tt_n = 2^n/n!
   harm\tt_n = 1/(n+1)
   quad\tt_n = 1/(n^2+1)
+  dfac\tt_n = 1/n!!
   llfac\tt_n = ceil(log2(log2(n+2)+2))/n!
   fac\tt_n = 1/n!
   mybin\tt_n = 0 for n>2
@@ -132,6 +140,7 @@ class tn:
     if ty=='const': s.df = lambda n: 1
     elif ty=='harm': s.df = lambda n: fm.Fraction(n+1)
     elif ty=='quad': s.df = lambda n: fm.Fraction(n*n+1)
+    elif ty=='dfac': s.df = lambda n: fm.Fraction(ss.factorial2(n, exact=True))
     elif ty=='fac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True))
     elif ty=='llfac':
       s.df = lambda n: fm.Fraction( ss.factorial(n, exact=True),
@@ -139,7 +148,7 @@ class tn:
 #       s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True),
 #                                    mm.ceil(mm.log(mm.log(n+2,2)+2,2)))
     elif ty=='efac': s.df = lambda n: fm.Fraction(ss.factorial(n, exact=True), 2**n)
-    elif ty=='mybin': s.ts = (2,3,1) # NOTE: tn>0 will always be dominated by last entry!
+    elif ty=='mybin': s.ts = (5,3,1) # NOTE: tn>0 will always be dominated by last entry!
     elif ty=='forest': s.ts = (1,1)
     else: print(f'sequence {ty} not recognized yet')
     s.type = ty # store type as string?
@@ -178,3 +187,20 @@ class tn:
     #     totW = 2**n # assuming t_n = 1 for now (16sep022)
     # just use tn as its own iterator or sequence type to random.choices()  say
     # which passes cumulative weights
+
+
+def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
+#   print('i j bit_num')
+#   for j in range(1,n):
+#     for i in range(j): print(i,j, gm.i2bit(i,j))
+# #   print('bn i  j')
+# #   for i in range(1<<nc2): print(i, bit2i(i))
+# #   exit()
+#   print()
+
+def popcount(n): return b.bit_count() #!!
+#bin(n).count('1')
+# www.valuedlessons.com/2009/01/popcount-in-python-with-benchmarks.html
+# First comment suggests that this is not completely terrible??!
+# Python 3.10 has more native popcount?
+# Just use this for now and profile (12jul022)
