@@ -142,10 +142,10 @@ u          undo
       if debug: print('col', c)
       if isinstance(M[rr][c],int) and po:
         M[rr][c] = pm.ratFunc(M[rr][c],None) + x*M[ro][c]
-        print(type(M[rr][c]), f'M{c} = M')
+        #print(type(M[rr][c]), f'M{c} = M')
       else:
         M[rr][c] += x*M[ro][c]
-        print(type(M[rr][c]), f'M{c} += M')
+        #print(type(M[rr][c]), f'M{c} += M')
 #     for c in range(n): M[rr][c] = M[rr][c] + x*M[ro][c]
 #     if fme:
 #       if rr==fme[0]: p += x*pt(ro,fme[1])
