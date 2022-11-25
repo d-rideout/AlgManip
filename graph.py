@@ -45,8 +45,9 @@ class graph:
   size : 'm|s|l' maybe, see above comments for some discussion
 
   Instance attributes:
-  n  : number of vertices/notes
+  n  : number of vertices/nodes/elts
   gr : graph as list (details depend on size above)
+  nn : node names (Is this a terrible name?)
 
   Class methods:
   writeDag    : write dot file (just hard coding dag aspect for now (16nov022))
@@ -54,11 +55,14 @@ class graph:
   transReduce : assuming dag, remove all relations/edges implied by transitivity'''
   dag = False
   size = 'm' # make this an attribute of an instance?
+
   # Do I want to pass n each time, or make it global?
   def __init__(s, n=0, gr=[]):
     'gr can be an int for a small graph, or a list of ints for a large graph'
     s.n = n
     s.gr = gr
+    s.nn = []
+
   def __str__(s): # cf pypi.org/project/diGraph ?
     if graph.size != 's': return f'<med graph on {s.n} nodes>'
     rv = ''
