@@ -1,20 +1,16 @@
 '''Fast graph module
 
 (The vertices of the graph are labeled with values taken from a poset, which
-are almost always the natural numbers.  (Since the order intervals of this
-poset will always be finite, it is in fact a causal set, or causet.)
-The partial ordering of the labels can be used
-to induce a partial order on the vertices, and thus, after transitive
+is usually the natural numbers.  A partial ordering of the labels can
+be used to induce a partial order on the vertices, and thus, after transitive
 closure, convert the graph into a causal set.)'''
-# [But how to handle spacelike vertices connected by an edge... ???
+# [How to handle spacelike vertices connected by an edge?
 # Just keep these as a second relation defined on the vertex set??]'''
-# 'Fast DAG (directed acyclic graph) module' # include all graphs?
-# (drop the acyclic assumption?)
 import scipy.special as ss # binomial coefficients
-import random as rm
-import fractions as fm
-import math as mm
-import util as u
+import random as rm        # to generate random graphs
+import fractions as fm     # python standard numbers
+import math as mm          # e.g. log
+# import util as u
 
 # What is a small graph?  oeis.org/A161680/list
 #  n nc2
@@ -38,36 +34,71 @@ import util as u
 # I am suspecting that all non-small graphs can be considered 'medium'!
 # There is no need for 'large' graphs.  Or maybe outside of a C implementation??
 # Parallel environment? (27sep022)
+# size = 'm'
 
-class graph:
+# class binrep:
+#   '''binary representation of graph
+#   lower case because it is intended to be internal to the graph module'''
+#   def __init__(s, n, gr):
+#     assert size == 'm', "assuming size == m for now"
+
+# math.stackexchange.com/questions/31207/graph-terminology-vertex-node-edge-arc
+# Let's prefer 'node' to 'vertex', since the latter comes from geometry
+# And prefer 'node' to 'element', since the latter is not generally used for graphs
+# And 'edge' to 'arc' since the former is more common?  Though it comes from geometry.  Can I avoid the term? (10jan023)
+
+class Graph:
   '''Class attributes:
-  dag  : boolean, used for output currently
+  dg  : directed graph? - used for output currently
   size : 'm|s|l' maybe, see above comments for some discussion
 
-  Instance attributes:
+  Instance attributes: (not necessarily defined for a given instance)
   n  : number of vertices/nodes/elts
-  gr : graph as list (details depend on size above)
-  nn : node names (Is this a terrible name?)
+  gr : binary representation of graph (details depend on size above)
+  nn : node names (indexed by natural label, for output)
+  nd : node_dict key name val dict keys  nl:natural label in: inbound edge set out: outbound edge set
+       edges stored by names -- natural labels may change
 
   Class methods:
   writeDag    : write dot file (just hard coding dag aspect for now (16nov022))
   transClose  : assuming dag, add all relations/edges implied by transitivity
-  transReduce : assuming dag, remove all relations/edges implied by transitivity'''
-  dag = False
-  size = 'm' # make this an attribute of an instance?
+  transReduce : assuming dag, remove all relations/edges implied by transitivity (transClose first!)
 
-  # Do I want to pass n each time, or make it global?
-  def __init__(s, n=0, gr=[]):
-    'gr can be an int for a small graph, or a list of ints for a large graph'
+  If you have a natural labeling of a causet, use it to populate nn and gr directly
+  Else use methods
+  <Graph instance>[i] indexes into the gr instance attribute'''
+  dg = True
+  size = 'm' # make this an attribute of an instance?
+  nd = {}
+
+  def __init__(s, n=0, gr=None):
+    '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
+    gr can be an int for a small graph, or a list of ints for a large graph'''
+#     assert s.size == size, "global size disagrees with class size"
+#     if not n: print('Please provide number of nodes as argument if it is known')
     s.n = n
+    if gr==None: gr = []
     s.gr = gr
-    s.nn = []
+#     s.gr = binrep(n, gr)
+    s.nn = [None]*n
+    if s.size != 'm':
+      print("WARNING: Some graph methods may implicitly assume Graph.size == 'm'?")
+
+  def __getitem__(s, i):
+    assert s.size=='m', "currently assumes medium graphs"
+    l = len(s.gr)
+    if l <= i: s.gr += [0]*(i+1-l)
+    return s.gr[i]
+
+  def __setitem__(s, i, v):
+    assert s.size=='m', "currently assumes medium graphs"
+    s.gr[i] = v
 
   def __str__(s): # cf pypi.org/project/diGraph ?
-    if graph.size != 's': return f'<med graph on {s.n} nodes>'
+    if s.size != 's': return f'<med graph on {s.n} nodes>'
     rv = ''
     spc = ''
-    if dag: rn = '<'
+    if dg: rn = '<'
     else: rn = '-'
     for j in range(1,s.n):
       for i in range(j):
@@ -75,6 +106,65 @@ class graph:
           rv += sp + f'{i}{rn}{j}'
           spc = ' '
     return rv
+
+  def _buildBinRep(s):
+    'reconstruct binary representation of graph'
+    s.gr = [0]*s.n
+    # Assuming graph is acyclic!!(?)
+    for x in s.nd: # fill in past(x)
+      xl = s.nd[x]['nl']
+      for pstx in s.nd[x]['in']: s[xl] |= 1<<s.nd[pstx]['nl']
+
+  def _dumpState(s):
+    'dump state for debugging'
+    print(f'n = {s.n}')
+    print(f'gr = {s.gr}')
+    print(f'nn = {s.nn}')
+#     print(f'nd = {s.nd}')
+    for x in s.nd:
+      print(f'[{x}]:')
+      print('nl =', s.nd[x]['nl'])
+      print('in =', s.nd[x]['in'])
+      print('out =', s.nd[x]['out'])
+
+  def addNode(s, x): # take multiple nodes? (10jan023)
+    "Add node x, coding 'generic' version first"
+#     if not s.nd: s.nd = {} # write all this as another method?? (10jan023)
+    if x in s.nd: return
+    s.nd[x] = {'nl':s.n, 'in':set(), 'out':set()}
+    s.nn.append(x)
+    print('addNode: nn =', s.nn)
+    s.n += 1
+
+  def addEdge(s, x, y): # Will one want to add undirected edges? (10jan023)
+    """Add directed edge from node x to node y
+    coding 'generic' version first"""
+    print(f"[{x}] \prec [{y}]")
+    s.addNode(x); s.addNode(y)
+    # Is edge consistent with natural labeling?
+    xl = s.nd[x]['nl']; yl = s.nd[y]['nl']
+    print(f'Is {xl} < {yl}?')
+    assert xl != yl
+    if xl > yl: # x and y are in wrong relation given natural labeling
+      print(f"{xl} \prec {yl} -- attempting to fix")
+      # shove all natural labels y .. to right
+      for tmp in s.nn[yl:xl]: s.nd[tmp]['nl'] += 1
+      s.nd[x]['nl'] = yl
+      print(s.nn)
+      s.nn.insert(yl, x)
+      print(s.nn)
+      s.nn.pop(xl+1)
+      print(s.nn, end='\n\n')
+      s.gr = None # destroy binary representation since it will be wrong now
+      s._dumpState()
+    # Store edge
+    s.nd[x]['out'].add(y)
+    s.nd[y]['in'].add(x)
+    assert s.size == 'm'
+    if s.gr != None: s[yl] |= 1<<xl
+
+#     if len(s.gr < 
+#     s.gr[y] |= 1<<x # This assumes size=='m'!
 
   def writeDag(s, fnr=None, st=None):
     '''Write dag to .dot file for graphviz
@@ -84,9 +174,12 @@ class graph:
     if s.size!='m':
       print('graphviz output of non-medium graphs not implemented yet')
       return
+    if s.gr==None: s._buildBinRep()
     if not fnr: fnr = f'dag{s.n:04}' #.dot'
     fp = open(fnr+'.dot', 'w', newline='')
     fp.write('digraph "'+fnr+'" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
+    if s.nn:
+      for i, nn in enumerate(s.nn): fp.write(f'{i} [label="{nn}"]\n')
     for x in range(s.n):
       w = s.gr[x]
       if w:
@@ -100,16 +193,17 @@ class graph:
 
   def transClose(s):
     'Compute transitive closure of graph interpreted as a dag'
-    if graph.size != 'm':
+    if s.size != 'm':
       print("Transitive closure of non-medium graphs not implemented yet")
       return
+    if s.gr==None: s._buildBinRep()
     for j in range(2,s.n): # i < j
       for i in range(1,j):
         if 1<<i & s.gr[j]: s.gr[j] |= s.gr[i]
   def transReduce(s):
     '''Compute transitive reduction of graph interpreted as a dag
     Be sure to compute transitive closure first, to get the correct answer!!'''
-    if graph.size != 'm':
+    if s.size != 'm':
       print("Transitive reduction of non-medium graphs not implemented yet")
       return
     for j in range(s.n-1,1,-1): # i < j

@@ -65,3 +65,9 @@ if True: # Maintain log of calling programs
 #
 #   def junkf(): pass
 #   print("empty function's __dict__ attribute:", junkf.__dict__)
+
+# TODO:
+# ----
+# * include hour?  time? (10jan023)
+# * grab argument of python3? (10jan023)
+# * count num entries? (10jan023)
