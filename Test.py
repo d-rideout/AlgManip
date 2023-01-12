@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 'Test code'
 
+# This program has not been well maintained.  Do not bother trying to get
+# tests to pass.  Either build new, passing tests, or use unittest (11jan023)
+
 from sys import argv
 
 if len(argv)<2:
@@ -8,18 +11,18 @@ if len(argv)<2:
   exit
 
 def check(expr, expect):
-  global np
+  global npassed
   got = str(expr)
   if got == expect:
     print(f'pass: [{got}]')
-    np += 1
+    npassed += 1
   else: print(f'fail: got [{got}] expect [{expect}]')
 
 
 if 'poly' in argv or 'all' in argv:
   import poly as pm
 
-  np = 0
+  npassed = 0
 
   pm.poly.sym = 'x'
   pm.poly.mv = False
@@ -36,18 +39,19 @@ if 'poly' in argv or 'all' in argv:
   p *= q
   check(p, '+ 1 - 5 x + 12 x^2 - 18 x^3 + 17 x^4 - 9 x^5 + 2 x^6')
 
-  print(np, 'of 4 tests pass\n')
+  print(npassed, 'of 4 tests pass\n')
 
 
 if 'graph' in argv or 'all' in argv:
   import graph as gm
   gm.rm.seed(0)
-  np = 0
+  npassed = 0
 
-  expect = ('[64]', '[25, 39]', '[18, 36, 10]', '[10, 21, 24, 9]', '[5, 12, 30, 13, 4]', '[1, 14, 20, 14, 13, 2]', '', '', '', '')
+  expect = ('[64]', '[25, 39]', '[18, 36, 10]', '[10, 21, 24, 9]', '[5, 12, 30, 13, 4]', '[1, 14, 20, 14, 13, 2]', '', '', '', '') # for default 'const'
 
   Ns = 64
-  g = gm.tn('harm')
+#   g = gm.tn('harm') expect numbers above come from default 'const'!
+  g = gm.tn()
   # print([g.sample(n) for n in range(15)])
   for n in range(10):
     f = [0]*(n+1)
@@ -57,4 +61,4 @@ if 'graph' in argv or 'all' in argv:
     check(f, expect[n])
 #     print(f)
 
-  print(np, 'of 6 tests pass')
+  print(npassed, 'of 6 tests pass')

@@ -1,12 +1,18 @@
+# Plotting variables used in poly.py:
 mplsym = ('o', 'x', '+', 'v')
 gnuplot = False # True  # gnuplot style display
 
-def die(msg): # Rethink how to handle this with exceptions! (16sep022)
+def die(msg): #, exception=None):
+  'abort gracefully with message but without complicated stack trace'
+#   'Pass an exception if you want a stack trace??' really only relevant if die() does something additional
   print(msg)
-  exit()
-  
+#   if exception: raise exception
+#   else:
+#   exit()  ipython does not like exit??
+  raise SystemExit
+
 def incList(l, min, max):
-  'increment list if ints'
+  'increment list of ints (see recursion.py)'
   ns = len(l)
   if not ns: die('incrementing empty list??')
   for i in range(ns):

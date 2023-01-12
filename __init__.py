@@ -11,13 +11,21 @@ print('Importing AlgManip python package module')
 # But is this silly?
 # What happens if someone does not put AlgManip in a directory which is in
 # their python path?
-# Oh, I think this question is answered in the next sentence?
+# Oh, I think this question is answered in the sentences below?
 # Please understand all this! The code below may be helpful for this. (29nov022)
 
 # My local imports are not package imports when called from other directories.
 # But am I duplicating modules this way?  Probably.  How do people manage this?
 #   print('module __name__ (from perspective of importing program) =', __name__, end='\n\n')
 #   # __name__ is just a string!
+
+# I think the current reality is that, since AlgManip can now be found from my
+# PYTHONPATH, I can use that full module path name for all internal modules as
+# well.  And the AlgManip package module is only loaded once, regardless of
+# which sub-modules are subsequently imported.
+# If someone wants to put AlgManip in a place which is inaccessible from PYTHONPATH, then it may not work without some workaround as above.
+# Note that local python programs such as Test.py can omit the AlgManip prefix, if they will be called from ./
+# Though the modules that it calls' modules will still be accessed via the AlgManip package. (11jan023)
 
 
 if True: # Maintain log of calling programs

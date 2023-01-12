@@ -10,7 +10,20 @@ import scipy.special as ss # binomial coefficients
 import random as rm        # to generate random graphs
 import fractions as fm     # python standard numbers
 import math as mm          # e.g. log
-# import util as u
+
+# Trying to understand all this module path business:
+# import sys
+# print(sys.path)
+import AlgManip.util as um
+# for m in sys.modules.keys():
+#   if m.__contains__('numpy'): continue
+#   if m.__contains__('scipy'): continue
+#   print(m)
+# # exit()
+# # quit()
+# sys.exit()
+
+debug = False
 
 # What is a small graph?  oeis.org/A161680/list
 #  n nc2
@@ -58,6 +71,7 @@ class Graph:
   nn : node names (indexed by natural label, for output)
   nd : node_dict key name val dict keys  nl:natural label in: inbound edge set out: outbound edge set
        edges stored by names -- natural labels may change
+  tc : Is graph(?) transitively closed? ('u' for unknown(?))
 
   Class methods:
   writeDag    : write dot file (just hard coding dag aspect for now (16nov022))
@@ -78,6 +92,8 @@ class Graph:
 #     if not n: print('Please provide number of nodes as argument if it is known')
     s.n = n
     if gr==None: gr = []
+    if n: s.tc = 'u'
+    else: s.tc = True
     s.gr = gr
 #     s.gr = binrep(n, gr)
     s.nn = [None]*n
@@ -146,23 +162,33 @@ class Graph:
     print(f'Is {xl} < {yl}?')
     assert xl != yl
     if xl > yl: # x and y are in wrong relation given natural labeling
+#       try:
       print(f"{xl} \prec {yl} -- attempting to fix")
       # shove all natural labels y .. to right
-      for tmp in s.nn[yl:xl]: s.nd[tmp]['nl'] += 1
+      pstx = s.nd[x]['in']
+      for tmp in s.nn[yl:xl]:
+        s.nd[tmp]['nl'] += 1
+        if tmp in pstx:
+          print("Naive attempt to maintain natural labeling of nodes failed.")
+          um.die("Not sure how to handle") # nor what is going to happen...")
+          # ... super unclear on the try-else -- I did not indent anything yet (11jan023)
       s.nd[x]['nl'] = yl
       print(s.nn)
       s.nn.insert(yl, x)
       print(s.nn)
       s.nn.pop(xl+1)
       print(s.nn, end='\n\n')
+#       else:
       s.gr = None # destroy binary representation since it will be wrong now
-      s._dumpState()
+      if debug: s._dumpState()
     # Store edge
     s.nd[x]['out'].add(y)
     s.nd[y]['in'].add(x)
     assert s.size == 'm'
     if s.gr != None: s[yl] |= 1<<xl
+    s.tc = False
 
+#     maybe code a separate method if x and y are already natural labels?
 #     if len(s.gr < 
 #     s.gr[y] |= 1<<x # This assumes size=='m'!
 
@@ -200,9 +226,12 @@ class Graph:
     for j in range(2,s.n): # i < j
       for i in range(1,j):
         if 1<<i & s.gr[j]: s.gr[j] |= s.gr[i]
+    s.tc = True
   def transReduce(s):
-    '''Compute transitive reduction of graph interpreted as a dag
-    Be sure to compute transitive closure first, to get the correct answer!!'''
+    '''Compute transitive reduction of graph interpreted as a dag'''
+#     Be sure to compute transitive closure first, to get the correct answer!!'''
+    if s.tc == False: s.transClose()
+    elif s.tc == 'u': print("WARNING: Unknown transitive closure state -- transitive reduction may be incorrect")
     if s.size != 'm':
       print("Transitive reduction of non-medium graphs not implemented yet")
       return
