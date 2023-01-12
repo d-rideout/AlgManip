@@ -62,47 +62,66 @@ debug = False
 
 class Graph:
   '''Class attributes:
-  dg  : directed graph? - used for output currently
+     [make any of these instance attributes if the need arises (12jan023)]
+  dg   : directed graph? - used for output currently
   size : 'm|s|l' maybe, see above comments for some discussion
+  nl   : identify nodes by natural labels, as opposed to name strings?
 
   Instance attributes: (not necessarily defined for a given instance)
   n  : number of vertices/nodes/elts
   gr : binary representation of graph (details depend on size above)
   nn : node names (indexed by natural label, for output)
-  nd : node_dict key name val dict keys  nl:natural label in: inbound edge set out: outbound edge set
-       edges stored by names -- natural labels may change
-  tc : Is graph(?) transitively closed? ('u' for unknown(?))
+  nd : node_dict key name val dict keys
+       nl:natural label
+       in: inbound edge set
+       out: outbound edge set
+       edge sets stored by names -- natural labels may change
+  st : state of binary edge storage
+       (edges stored in nd are those that have been explicitly declared)
+       (gr=None) : no binary storage
+       'u'  : unknown
+       'tc' : transitively closed
+       'tr' : transitively reduced
+       'tcr' : both transitively closed and reduced
+               (for partial orders of height <=2)
+#   tc : Is graph(?) transitively closed? ('u' for unknown(?)) [deprecated (12jan023)]
 
   Class methods:
   writeDag    : write dot file (just hard coding dag aspect for now (16nov022))
   transClose  : assuming dag, add all relations/edges implied by transitivity
   transReduce : assuming dag, remove all relations/edges implied by transitivity (transClose first!)
 
-  If you have a natural labeling of a causet, use it to populate nn and gr directly
-  Else use methods
+  If you have a natural labeling of a causet,
+  use it to populate nn and gr directly (and set nl=True).
+  Else use methods.
   <Graph instance>[i] indexes into the gr instance attribute'''
   dg = True
-  size = 'm' # make this an attribute of an instance?
-  nd = {}
+  size = 'm'
+  nl = False
 
   def __init__(s, n=0, gr=None):
     '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
-    gr can be an int for a small graph, or a list of ints for a large graph'''
+    gr can be an int for a small graph, or a list of ints for a large graph
+    Please update st attribute after edges are added, if known (and n>2)'''
 #     assert s.size == size, "global size disagrees with class size"
-#     if not n: print('Please provide number of nodes as argument if it is known')
+    if n==0 and s.nl: print("WARNING: nl causets are not guaranteed to learn their true size from the edges alone")
     s.n = n
     if gr==None: gr = []
-    if n: s.tc = 'u'
-    else: s.tc = True
+    if n>2: s.st = 'u'
+    else: s.st = 'tcr'
     s.gr = gr
 #     s.gr = binrep(n, gr)
     s.nn = [None]*n
+    if s.nl: s.nd = None
+    else: s.nd = {}
+
     if s.size != 'm':
       print("WARNING: Some graph methods may implicitly assume Graph.size == 'm'?")
 
   def __getitem__(s, i):
     assert s.size=='m', "currently assumes medium graphs"
     l = len(s.gr)
+    if l>s.n: s.n=l
     if l <= i: s.gr += [0]*(i+1-l)
     return s.gr[i]
 
@@ -153,9 +172,14 @@ class Graph:
     s.n += 1
 
   def addEdge(s, x, y): # Will one want to add undirected edges? (10jan023)
-    """Add directed edge from node x to node y
-    coding 'generic' version first"""
+    """Add directed edge from node x to node y"""
+#     coding 'generic' version first"""
     print(f"[{x}] \prec [{y}]")
+    s.st = 'u' # I don't see how to avoid this easily?
+               # Should we have some convention when nl == True?? (12jan023)
+    if s.nl: # if using natural labels to identify nodes
+      s[y] |= 1<<x # This assumes size=='m'!
+      return
     s.addNode(x); s.addNode(y)
     # Is edge consistent with natural labeling?
     xl = s.nd[x]['nl']; yl = s.nd[y]['nl']
@@ -186,11 +210,7 @@ class Graph:
     s.nd[y]['in'].add(x)
     assert s.size == 'm'
     if s.gr != None: s[yl] |= 1<<xl
-    s.tc = False
-
-#     maybe code a separate method if x and y are already natural labels?
-#     if len(s.gr < 
-#     s.gr[y] |= 1<<x # This assumes size=='m'!
+#     s.tc = False
 
   def writeDag(s, fnr=None, st=None):
     '''Write dag to .dot file for graphviz
@@ -201,6 +221,7 @@ class Graph:
       print('graphviz output of non-medium graphs not implemented yet')
       return
     if s.gr==None: s._buildBinRep()
+    if s.st[-1]!='r': s.transReduce() # too wonky? (12jan023)
     if not fnr: fnr = f'dag{s.n:04}' #.dot'
     fp = open(fnr+'.dot', 'w', newline='')
     fp.write('digraph "'+fnr+'" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
@@ -227,11 +248,13 @@ class Graph:
       for i in range(1,j):
         if 1<<i & s.gr[j]: s.gr[j] |= s.gr[i]
     s.tc = True
+
   def transReduce(s):
-    '''Compute transitive reduction of graph interpreted as a dag'''
-#     Be sure to compute transitive closure first, to get the correct answer!!'''
-    if s.tc == False: s.transClose()
-    elif s.tc == 'u': print("WARNING: Unknown transitive closure state -- transitive reduction may be incorrect")
+    'Compute transitive reduction of graph interpreted as a dag'
+    if s.st[-1] == 'r': return
+    if s.st == 'u': print('Unknown transitive closure state -- assuming the worst')
+    if s.st != 'tc': s.transClose()
+#     elif s.tc == 'u': print("WARNING: Unknown transitive closure state -- transitive reduction may be incorrect")
     if s.size != 'm':
       print("Transitive reduction of non-medium graphs not implemented yet")
       return
