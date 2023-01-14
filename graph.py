@@ -65,11 +65,12 @@ debug = False
 # And 'edge' to 'arc' since the former is more common?  Though it comes from geometry.  Can I avoid the term? (10jan023)
 
 class Graph:
+  # make class attributes instance attributes if the need arises (12jan023)
   '''Class attributes: Set these before calling constructor
-     [make any of these instance attributes if the need arises (12jan023)]
   dg   : directed graph? - used for output currently
   size : 'm|s|l' maybe, see above comments for some discussion
-  nl   : assume natural labeling is known at the outset and fixed
+  nl   : assume application code knows natural labeling (though not necessarily
+         number of nodes!)
 
   Instance attributes: (not necessarily defined for a given instance)
   n  : number of vertices/nodes/elts
@@ -109,25 +110,31 @@ class Graph:
   def __init__(s, n=0, gr=None):
     '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
     gr can be an int for a small graph, or a list of ints for a large graph
-    Please update st attribute after edges are added, if known (and n>2)'''
+    Please update st attribute after edges are added, if known (and n>2)
+
+    Even in the case of nl, the graph size may not be known at time of construction!'''
     #     assert s.size == size, "global size disagrees with class size"
-    if s.nl: print("Constructing graph assuming known labeling")
+    if s.nl:
+      print("Constructing graph assuming known labeling")
+      if n==0: print("with unknown n: Please add nodes via addNode() method")
+        #print("Using natural labeling but with unknown n.  Please add nodes via addNode() method")
+        #print("WARNING: nl causets are not guaranteed to learn their true size from the edges alone")
+      if gr==None: gr = [0]*n
+      # s.nn = [None]*n
+      s.nn = um.myList([None]*n)
+      # print(type(s.nn))
+      s.nd = None
     else:
       print("Constructing graph with non-natural labeling")
       if n:
         print("Ignoring input n.  Please use addNode() or addEdge() methods to populate graph")
         n = 0
-    if n==0 and s.nl: print("WARNING: nl causets are not guaranteed to learn their true size from the edges alone")
+      s.nn = []
+      s.nd = {}
     s.n = n
-    if gr==None and s.nl: gr = [0]*n
     if n>2: s.st = 'u'
     else: s.st = 'tcr'
     s.gr = gr
-    if s.nl: s.nn = [None]*n
-    else: s.nn = []
-    if s.nl: s.nd = None
-    else: s.nd = {}
-
     if s.size != 'm':
       print("WARNING: Some graph methods may implicitly assume Graph.size == 'm'?")
 
@@ -178,11 +185,12 @@ class Graph:
       print('in =', s.nd[x]['in'])
       print('out =', s.nd[x]['out'])
 
-  def addNode(s, x): # take multiple nodes? (10jan023)
-    "Add node x, coding 'generic' version first"
-#     if not s.nd: s.nd = {} # write all this as another method?? (10jan023)
-    if x in s.nd: return
-    s.nd[x] = {'nl':s.n, 'in':set(), 'out':set()}
+  def addNode(s, x): # accept multiple nodes too? (10jan023)
+    # Might want to allow unnamed nodes too (14jan023)
+    "Add node x" #, coding 'generic' version first"
+    if s.nd: # == nl currently (14jan023)
+      if x in s.nd: return
+      s.nd[x] = {'nl':s.n, 'in':set(), 'out':set()}
     s.nn.append(x)
     if debug: print('addNode: nn =', s.nn)
     s.n += 1

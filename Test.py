@@ -1,8 +1,14 @@
-#!/usr/bin/env python3
+#!/usr/bin/env ipython
+#!/usr/bin/env python3 -- ipython is slower but so much nicer for debugging! (14jan023)
 'Test code'
 
-# This program has not been well maintained.  Do not bother trying to get
-# tests to pass.  Either build new, passing tests, or use unittest (11jan023)
+# Status:
+# * poly tests seem to be broken -- please fix (14jan023)
+# * graph tests pass out to n=5 for the default const (tn) (14jan023)
+
+# Fix these tests, but
+# consider migrating to unittest before devoting a huge amount of effort coding
+# new tests here. (14jan023)
 
 from sys import argv
 
@@ -27,17 +33,17 @@ if 'poly' in argv or 'all' in argv:
   pm.poly.sym = 'x'
   pm.poly.mv = False
 
-  p = pm.poly()
-  check(p, '0')
+  po = pm.poly()
+  check(po, '0')
 
-  p += pm.omqn(4)
-  check(p, '+ 1 - 4 x + 6 x^2 - 4 x^3 + x^4')
+  po += pm.omqn(4)
+  check(po, '+ 1 - 4 x + 6 x^2 - 4 x^3 + x^4')
 
-  q = pm.poly([(1,0), (-1,1), (2,2)])
-  check(q, '+ 1 - x + 2 x^2')
+  qo = pm.poly([(1,0), (-1,1), (2,2)])
+  check(qo, '+ 1 - x + 2 x^2')
 
-  p *= q
-  check(p, '+ 1 - 5 x + 12 x^2 - 18 x^3 + 17 x^4 - 9 x^5 + 2 x^6')
+  po *= qo
+  check(po, '+ 1 - 5 x + 12 x^2 - 18 x^3 + 17 x^4 - 9 x^5 + 2 x^6')
 
   print(npassed, 'of 4 tests pass\n')
 
