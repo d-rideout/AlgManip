@@ -61,15 +61,16 @@ debug = False
 # And 'edge' to 'arc' since the former is more common?  Though it comes from geometry.  Can I avoid the term? (10jan023)
 
 class Graph:
-  '''Class attributes:
+  '''Class attributes: Set these before calling constructor
      [make any of these instance attributes if the need arises (12jan023)]
   dg   : directed graph? - used for output currently
   size : 'm|s|l' maybe, see above comments for some discussion
-  nl   : identify nodes by natural labels, as opposed to name strings?
+  nl   : assume natural labeling is known at the outset and fixed
 
   Instance attributes: (not necessarily defined for a given instance)
   n  : number of vertices/nodes/elts
   gr : binary representation of graph (details depend on size above)
+       (medium graphs hold useless 0 in gr[0])
   nn : node names (indexed by natural label, for output)
   nd : node_dict key name val dict keys
        nl:natural label
@@ -79,6 +80,7 @@ class Graph:
   st : state of binary edge storage
        (edges stored in nd are those that have been explicitly declared)
        (gr=None) : no binary storage
+       None : none of the below
        'u'  : unknown
        'tc' : transitively closed
        'tr' : transitively reduced
@@ -103,15 +105,21 @@ class Graph:
     '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
     gr can be an int for a small graph, or a list of ints for a large graph
     Please update st attribute after edges are added, if known (and n>2)'''
-#     assert s.size == size, "global size disagrees with class size"
+    #     assert s.size == size, "global size disagrees with class size"
+    if s.nl: print("Constructing graph assuming known labeling")
+    else:
+      print("Constructing graph with non-natural labeling")
+      if n:
+        print("Ignoring input n.  Please use addNode() or addEdge() methods to populate graph")
+        n = 0
     if n==0 and s.nl: print("WARNING: nl causets are not guaranteed to learn their true size from the edges alone")
     s.n = n
-    if gr==None: gr = []
+    if gr==None and s.nl: gr = [0]*n
     if n>2: s.st = 'u'
     else: s.st = 'tcr'
     s.gr = gr
-#     s.gr = binrep(n, gr)
-    s.nn = [None]*n
+    if s.nl: s.nn = [None]*n
+    else: s.nn = []
     if s.nl: s.nd = None
     else: s.nd = {}
 
@@ -143,12 +151,14 @@ class Graph:
     return rv
 
   def _buildBinRep(s):
-    'reconstruct binary representation of graph'
+    'reconstruct binary representation of graph and nn[]'
     s.gr = [0]*s.n
+    s.nn = [None]*s.n
     # Assuming graph is acyclic!!(?)
     for x in s.nd: # fill in past(x)
       xl = s.nd[x]['nl']
       for pstx in s.nd[x]['in']: s[xl] |= 1<<s.nd[pstx]['nl']
+      s.nn[xl] = x
 
   def _dumpState(s):
     'dump state for debugging'
@@ -168,7 +178,7 @@ class Graph:
     if x in s.nd: return
     s.nd[x] = {'nl':s.n, 'in':set(), 'out':set()}
     s.nn.append(x)
-    print('addNode: nn =', s.nn)
+    if debug: print('addNode: nn =', s.nn)
     s.n += 1
 
   def addEdge(s, x, y): # Will one want to add undirected edges? (10jan023)
@@ -201,9 +211,10 @@ class Graph:
       s.nn.insert(yl, x)
       print(s.nn)
       s.nn.pop(xl+1)
-      print(s.nn, end='\n\n')
+      print(s.nn) #, end='\n\n')
 #       else:
       s.gr = None # destroy binary representation since it will be wrong now
+      s.nn = None
       if debug: s._dumpState()
     # Store edge
     s.nd[x]['out'].add(y)
@@ -211,6 +222,19 @@ class Graph:
     assert s.size == 'm'
     if s.gr != None: s[yl] |= 1<<xl
 #     s.tc = False
+
+  def queryEdge(s, x, y):
+    '''query presence of edge using node names, in either direction
+    Uses binary representation so can query after transitive closure
+    returns 2-tuple with earlier node on left if edge present [too complicated? (12jan023)]
+    or False if no binary representation [also too complicated? (12jan023)]'''
+    if not s.gr: return False
+    xl = s.nd[x]['nl']
+    yl = s.nd[y]['nl']
+    if xl>yl: xl, yl = yl, xl
+    if debug: print(f'queryEdge:')
+    if 1<<xl & s.gr[yl]: return s.nn[xl], s.nn[yl]
+#     return 1<<xl & s.gr[yl]
 
   def writeDag(s, fnr=None, st=None):
     '''Write dag to .dot file for graphviz
@@ -221,7 +245,7 @@ class Graph:
       print('graphviz output of non-medium graphs not implemented yet')
       return
     if s.gr==None: s._buildBinRep()
-    if s.st[-1]!='r': s.transReduce() # too wonky? (12jan023)
+    if not s.st or s.st[-1]!='r': s.transReduce() # too wonky? (12jan023)
     if not fnr: fnr = f'dag{s.n:04}' #.dot'
     fp = open(fnr+'.dot', 'w', newline='')
     fp.write('digraph "'+fnr+'" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
@@ -244,6 +268,7 @@ class Graph:
       print("Transitive closure of non-medium graphs not implemented yet")
       return
     if s.gr==None: s._buildBinRep()
+    if debug: print(f'transClose: nl={s.nl} gr={s.gr}')
     for j in range(2,s.n): # i < j
       for i in range(1,j):
         if 1<<i & s.gr[j]: s.gr[j] |= s.gr[i]
@@ -251,7 +276,7 @@ class Graph:
 
   def transReduce(s):
     'Compute transitive reduction of graph interpreted as a dag'
-    if s.st[-1] == 'r': return
+    if s.st and s.st[-1] == 'r': return
     if s.st == 'u': print('Unknown transitive closure state -- assuming the worst')
     if s.st != 'tc': s.transClose()
 #     elif s.tc == 'u': print("WARNING: Unknown transitive closure state -- transitive reduction may be incorrect")
