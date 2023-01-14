@@ -10,6 +10,7 @@ import scipy.special as ss # binomial coefficients
 import random as rm        # to generate random graphs
 import fractions as fm     # python standard numbers
 import math as mm          # e.g. log
+from copy import deepcopy
 
 # Trying to understand all this module path business:
 # import sys
@@ -24,6 +25,7 @@ import AlgManip.util as um
 # sys.exit()
 
 debug = False
+# debug = True
 
 # What is a small graph?  oeis.org/A161680/list
 #  n nc2
@@ -43,6 +45,8 @@ debug = False
 #  A bit?  And this matters greatly for such tiny numbers.)
 # I suppose the best way to answer such questions (besides digging into source
 # code) is to run experiments.  Any volunteers?
+#
+# u = (1<<i2bit(n-2,n-1)+1)-1 complete graph / chain (?)
 #
 # I am suspecting that all non-small graphs can be considered 'medium'!
 # There is no need for 'large' graphs.  Or maybe outside of a C implementation??
@@ -71,6 +75,7 @@ class Graph:
   n  : number of vertices/nodes/elts
   gr : binary representation of graph (details depend on size above)
        (medium graphs hold useless 0 in gr[0])
+  grr: transitively reduced binary representation
   nn : node names (indexed by natural label, for output)
   nd : node_dict key name val dict keys
        nl:natural label
@@ -152,6 +157,7 @@ class Graph:
 
   def _buildBinRep(s):
     'reconstruct binary representation of graph and nn[]'
+    if debug: print('Reconstructing binary representation')
     s.gr = [0]*s.n
     s.nn = [None]*s.n
     # Assuming graph is acyclic!!(?)
@@ -181,6 +187,28 @@ class Graph:
     if debug: print('addNode: nn =', s.nn)
     s.n += 1
 
+  def _relabel(s):
+    'attempt to find natural labeling of graph'
+    #relabel algorithm assumes transitive closure!
+    nl = 0
+    done = set()
+    newdone = set()
+    print(f'relabeling {s.n}-node digraph')
+    if debug: s._dumpState()
+    while nl<s.n:
+      progress = False
+      done.update(newdone)
+      for xn in s.nd:
+  #       print(f'x={x}')
+        if xn in done: continue
+#         if debug: print(f"{s.nd[xn]['in']} \ {done}")
+        if not s.nd[xn]['in']-done:
+          s.nd[xn]['nl'] = nl
+          nl += 1
+          newdone.add(xn)
+          progress = True
+      if not progress: um.die('Relabeling failed: Graph contains cycle?')
+
   def addEdge(s, x, y): # Will one want to add undirected edges? (10jan023)
     """Add directed edge from node x to node y"""
 #     coding 'generic' version first"""
@@ -198,21 +226,22 @@ class Graph:
     if xl > yl: # x and y are in wrong relation given natural labeling
 #       try:
       print(f"{xl} \prec {yl} -- attempting to fix")
-      # shove all natural labels y .. to right
-      pstx = s.nd[x]['in']
-      for tmp in s.nn[yl:xl]:
-        s.nd[tmp]['nl'] += 1
-        if tmp in pstx:
-          print("Naive attempt to maintain natural labeling of nodes failed.")
-          um.die("Not sure how to handle") # nor what is going to happen...")
-          # ... super unclear on the try-else -- I did not indent anything yet (11jan023)
-      s.nd[x]['nl'] = yl
-      print(s.nn)
-      s.nn.insert(yl, x)
-      print(s.nn)
-      s.nn.pop(xl+1)
-      print(s.nn) #, end='\n\n')
-#       else:
+      s._relabel()
+#       # shove all natural labels y .. to right
+#       pstx = s.nd[x]['in']
+#       for tmp in s.nn[yl:xl]:
+#         s.nd[tmp]['nl'] += 1
+#         if tmp in pstx:
+#           print("Naive attempt to maintain natural labeling of nodes failed.")
+#           um.die("Not sure how to handle") # nor what is going to happen...")
+#           # ... super unclear on the try-else -- I did not indent anything yet (11jan023)
+#       s.nd[x]['nl'] = yl
+#       print(s.nn)
+#       s.nn.insert(yl, x)
+#       print(s.nn)
+#       s.nn.pop(xl+1)
+#       print(s.nn) #, end='\n\n')
+# #       else:
       s.gr = None # destroy binary representation since it will be wrong now
       s.nn = None
       if debug: s._dumpState()
@@ -232,14 +261,17 @@ class Graph:
     xl = s.nd[x]['nl']
     yl = s.nd[y]['nl']
     if xl>yl: xl, yl = yl, xl
-    if debug: print(f'queryEdge:')
+    if debug:
+      s._dumpState()
+      print(f'queryEdge: xl={xl} yl={yl}')
     if 1<<xl & s.gr[yl]: return s.nn[xl], s.nn[yl]
 #     return 1<<xl & s.gr[yl]
 
   def writeDag(s, fnr=None, st=None):
     '''Write dag to .dot file for graphviz
     fnr = filename root
-    st = string to add to dot file : Please add '#' to beginning of comments!'''
+    st = string to add to dot file : Please add '#' to beginning of comments!
+    Uses grr instead of gr.  Is this a problem??'''
     # dag ==> digraph.  Separate method writeG() can output undirected graph
     if s.size!='m':
       print('graphviz output of non-medium graphs not implemented yet')
@@ -252,7 +284,7 @@ class Graph:
     if s.nn:
       for i, nn in enumerate(s.nn): fp.write(f'{i} [label="{nn}"]\n')
     for x in range(s.n):
-      w = s.gr[x]
+      w = s.grr[x]
       if w:
         for b in range(w.bit_length()):
           if 1<<b & w: fp.write(f'{b}->{x}; ')
@@ -268,11 +300,12 @@ class Graph:
       print("Transitive closure of non-medium graphs not implemented yet")
       return
     if s.gr==None: s._buildBinRep()
-    if debug: print(f'transClose: nl={s.nl} gr={s.gr}')
+    if debug: print(f'in  transClose: nl={s.nl} gr={s.gr}')
     for j in range(2,s.n): # i < j
       for i in range(1,j):
         if 1<<i & s.gr[j]: s.gr[j] |= s.gr[i]
     s.tc = True
+    if debug: print(f'out transClose: nl={s.nl} gr={s.gr}')
 
   def transReduce(s):
     'Compute transitive reduction of graph interpreted as a dag'
@@ -283,12 +316,13 @@ class Graph:
     if s.size != 'm':
       print("Transitive reduction of non-medium graphs not implemented yet")
       return
+    s.grr = deepcopy(s.gr)
     for j in range(s.n-1,1,-1): # i < j
       for i in range(j-1, 0, -1):
         try:
-          if 1<<i & s.gr[j]: s.gr[j] &= ~s.gr[i] # note that relation should be irreflexive
+          if 1<<i & s.grr[j]: s.grr[j] &= ~s.grr[i] # note that relation should be irreflexive
         except IndexError: print('index error:', i,j)
-# u = (1<<i2bit(n-2,n-1)+1)-1 complete graph / chain (?)
+
 
 
 # Random Graphs via 'Generalized Percolation'
