@@ -78,7 +78,7 @@ class Graph:
        (medium graphs hold useless 0 in gr[0])
   grr: transitively reduced binary representation
   nn : node names (indexed by natural label, for output)
-  nd : node_dict key name val dict keys
+  nd : node_dict key name val dict keys [better to make .nd[x] objects?]
        nl:natural label
        in: inbound edge set
        out: outbound edge set
@@ -188,7 +188,8 @@ class Graph:
   def addNode(s, x): # accept multiple nodes too? (10jan023)
     # Might want to allow unnamed nodes too (14jan023)
     "Add node x" #, coding 'generic' version first"
-    if s.nd: # == nl currently (14jan023)
+    if debug: print(f'addNode: {x} nd={s.nd}')
+    if s.nd!=None: # \equiv nl currently (14jan023)
       if x in s.nd: return
       s.nd[x] = {'nl':s.n, 'in':set(), 'out':set()}
     s.nn.append(x)
@@ -266,6 +267,7 @@ class Graph:
     returns 2-tuple with earlier node on left if edge present [too complicated? (12jan023)]
     or False if no binary representation [also too complicated? (12jan023)]'''
     if not s.gr: return False
+    if not (x in s.nd and y in s.nd): return False # non-existent nodes are not part of edges
     xl = s.nd[x]['nl']
     yl = s.nd[y]['nl']
     if xl>yl: xl, yl = yl, xl
