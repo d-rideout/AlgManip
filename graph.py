@@ -64,6 +64,14 @@ debug = False
 # And prefer 'node' to 'element', since the latter is not generally used for graphs
 # And 'edge' to 'arc' since the former is more common?  Though it comes from geometry.  Can I avoid the term? (10jan023)
 
+class node: # lower case because it is internal (and nested classes are really confusing)
+  def __init__(s, nl, pst=None, fut=None):
+    if pst==None: pst = set()
+    if fut==None: fut = set()
+    s.nl = nl
+    s.pst = pst
+    s.fut = fut
+
 class Graph:
   # make class attributes instance attributes if the need arises (12jan023)
   '''Class attributes: Set these before calling constructor
@@ -78,7 +86,7 @@ class Graph:
        (medium graphs hold useless 0 in gr[0])
   grr: transitively reduced binary representation
   nn : node names (indexed by natural label, for output)
-  nd : node_dict key name val dict keys [better to make .nd[x] objects?]
+  nd : node_dict key name val dict keys [better to make .nd[x] node objects?]
        nl:natural label
        in: inbound edge set
        out: outbound edge set
@@ -197,13 +205,15 @@ class Graph:
     s.n += 1
 
   def _relabel(s):
-    'attempt to find natural labeling of graph'
-    #relabel algorithm assumes transitive closure!
+    '''Attempt to find natural labeling of graph
+    I *think* this works for non-transitive digraphs'''
     nl = 0
     done = set()
     newdone = set()
     print(f'relabeling {s.n}-node digraph')
-    if debug: s._dumpState()
+#     if debug:
+#       print('Before relabeling:')
+#       s._dumpState()
     while nl<s.n:
       progress = False
       done.update(newdone)
@@ -217,6 +227,11 @@ class Graph:
           newdone.add(xn)
           progress = True
       if not progress: um.die('Relabeling failed: Graph contains cycle?')
+    s.gr = None # destroy binary representation since it will be wrong now
+    s.nn = None
+#     if debug:
+#       print('After relabeling:')
+#       s._dumpState()
 
   def addEdge(s, x, y): # Will one want to add undirected edges? (10jan023)
     """Add directed edge from node x to node y"""
@@ -232,34 +247,16 @@ class Graph:
     xl = s.nd[x]['nl']; yl = s.nd[y]['nl']
     print(f'Is {xl} < {yl}?')
     assert xl != yl
-    if xl > yl: # x and y are in wrong relation given natural labeling
-#       try:
-      print(f"{xl} \prec {yl} -- attempting to fix")
-      s._relabel()
-#       # shove all natural labels y .. to right
-#       pstx = s.nd[x]['in']
-#       for tmp in s.nn[yl:xl]:
-#         s.nd[tmp]['nl'] += 1
-#         if tmp in pstx:
-#           print("Naive attempt to maintain natural labeling of nodes failed.")
-#           um.die("Not sure how to handle") # nor what is going to happen...")
-#           # ... super unclear on the try-else -- I did not indent anything yet (11jan023)
-#       s.nd[x]['nl'] = yl
-#       print(s.nn)
-#       s.nn.insert(yl, x)
-#       print(s.nn)
-#       s.nn.pop(xl+1)
-#       print(s.nn) #, end='\n\n')
-# #       else:
-      s.gr = None # destroy binary representation since it will be wrong now
-      s.nn = None
-      if debug: s._dumpState()
     # Store edge
     s.nd[x]['out'].add(y)
     s.nd[y]['in'].add(x)
+    if xl > yl: # x and y are in wrong relation given natural labeling
+      print(f"{xl} \prec {yl} -- attempting to fix")
+      s._relabel()
+#       if debug: s._dumpState()
     assert s.size == 'm'
     if s.gr != None: s[yl] |= 1<<xl
-#     s.tc = False
+#     s.tc = False  Why is this commented?? (15jan023)
 
   def queryEdge(s, x, y):
     '''query presence of edge using node names, in either direction
