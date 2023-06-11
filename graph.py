@@ -173,8 +173,9 @@ class Graph:
   def _buildBinRep(s):
     'reconstruct binary representation of graph and nn[]'
     if debug: print('Reconstructing binary representation')
-    s.gr = [0]*s.n
-    s.nn = [None]*s.n
+    if s.n:
+      s.gr = [0]*s.n
+      s.nn = [None]*s.n
     # Assuming graph is acyclic!!(?)
     for x in s.nd: # fill in past(x)
       xl = s.nd[x]['nl']
@@ -228,7 +229,7 @@ class Graph:
           progress = True
       if not progress: um.die('Relabeling failed: Graph contains cycle?')
     s.gr = None # destroy binary representation since it will be wrong now
-    s.nn = None
+    s.nn = []
 #     if debug:
 #       print('After relabeling:')
 #       s._dumpState()
@@ -274,10 +275,10 @@ class Graph:
     if 1<<xl & s.gr[yl]: return s.nn[xl], s.nn[yl]
 #     return 1<<xl & s.gr[yl]
 
-  def writeDag(s, fnr=None, st=None):
+  def writeDag(s, fnr=None, ast=None):
     '''Write dag to .dot file for graphviz
     fnr = filename root
-    st = string to add to dot file : Please add '#' to beginning of comments!
+    ast = string to add to dot file : Please add '#' to beginning of comments!
     Uses grr instead of gr.  Is this a problem??'''
     # dag ==> digraph.  Separate method writeG() can output undirected graph
     if s.size!='m':
@@ -297,7 +298,7 @@ class Graph:
           if 1<<b & w: fp.write(f'{b}->{x}; ')
         fp.write('\n')
       else: fp.write(f'{x};\n') # PERF: sometimes redundant
-    if st: fp.write(st+'\n')
+    if ast: fp.write(ast+'\n')
     fp.write('}\n')
     print(f'time dot -Tpdf -o {fnr}.pdf {fnr}.dot')
 
