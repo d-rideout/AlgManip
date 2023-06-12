@@ -106,6 +106,7 @@ class Graph:
   writeDag    : write dot file (just hard coding dag aspect for now (16nov022))
   transClose  : assuming dag, add all relations/edges implied by transitivity
   transReduce : assuming dag, remove all relations/edges implied by transitivity (transClose first!)
+  automorphism : Is map an automorphism?
 
   If you have a natural labeling of a causet,
   use it to populate nn and gr directly (and set nl=True).
@@ -118,22 +119,27 @@ class Graph:
   def __init__(s, n=0, gr=None):
     '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
     gr can be an int for a small graph, or a list of ints for a large graph
-    Please update st attribute after edges are added, if known (and n>2)
+    Please update st instance attribute (state of binary edge storage) after edges are added, if known (and n>2)
 
     Even in the case of nl, the graph size may not be known at time of construction!'''
     #     assert s.size == size, "global size disagrees with class size"
+    if s.dg: directed = ' directed '
+    else: directed = ' '
     if s.nl:
-      print("Constructing graph assuming known labeling")
-      if n==0: print("with unknown n: Please add nodes via addNode() method")
+      print("Constructing"+directed+"graph assuming known labeling")
+      if n==0: print("... with default n=0: Consider adding nodes via addNode() method.")
         #print("Using natural labeling but with unknown n.  Please add nodes via addNode() method")
         #print("WARNING: nl causets are not guaranteed to learn their true size from the edges alone")
-      if gr==None: gr = [0]*n
+      if gr==None:
+        if s.size=='m': gr = [0]*n
+        elif s.size=='s': gr = 0
+        else: um.die('Unknown graph size')
       # s.nn = [None]*n
       s.nn = um.myList([None]*n)
       # print(type(s.nn))
       s.nd = None
     else:
-      print("Constructing graph with non-natural labeling")
+      print("Constructing"+directed+"graph with non-natural labeling")
       if n:
         print("Ignoring input n.  Please use addNode() or addEdge() methods to populate graph")
         n = 0
@@ -161,13 +167,19 @@ class Graph:
     if s.size != 's': return f'<med graph on {s.n} nodes>'
     rv = ''
     spc = ''
-    if dg: rn = '<'
+    if s.dg: rn = '<'
     else: rn = '-'
+    disconnected = [True]*s.n
     for j in range(1,s.n):
       for i in range(j):
-        if s.g & 1<<i2bit(i,j):
-          rv += sp + f'{i}{rn}{j}'
+        if s.gr & 1<<i2bit(i,j):
+          rv += spc + f'{i}{rn}{j}'
+          disconnected[i] = disconnected[j] = False
           spc = ' '
+    for i in range(s.n):
+      if disconnected[i]:
+        rv += spc + str(i)
+        spc = ' '
     return rv
 
   def _buildBinRep(s):
@@ -188,6 +200,7 @@ class Graph:
     print(f'gr = {s.gr}')
     print(f'nn = {s.nn}')
 #     print(f'nd = {s.nd}')
+    if not s.nd: return
     for x in s.nd:
       print(f'[{x}]:')
       print('nl =', s.nd[x]['nl'])
@@ -258,6 +271,11 @@ class Graph:
     assert s.size == 'm'
     if s.gr != None: s[yl] |= 1<<xl
 #     s.tc = False  Why is this commented?? (15jan023)
+
+  def prec(s, x, y):
+    'fast query for small graphs?  Assumes x<y.'
+    # PERF: include order check??
+    return s.gr & 1<<i2bit(x,y)
 
   def queryEdge(s, x, y):
     '''query presence of edge using node names, in either direction
@@ -331,6 +349,26 @@ class Graph:
           if 1<<i & s.grr[j]: s.grr[j] &= ~s.grr[i] # note that relation should be irreflexive
         except IndexError: print('index error:', i,j)
 
+  def automorphism(s, phi):
+    '''Is phi an automorphism?
+    Possibly making numerous unstated assumptions.  e.g. not checking input.
+    phi is 'list' of natural number labels (i.e. a permutation)'''
+    # assuming binary storage for now
+    print('Is', map, 'an automorphism?')
+    for y in range(1,s.n):
+      for x in range(y):
+        px, py = phi[x],phi[y]
+        print(x,y, s.prec(x,y), end=' : ')
+        print(px,py)
+        if s.prec(x,y):
+          if px>py: return False
+          if not s.prec(px,py): return False
+        else:
+          if px>py: px,py = py,px
+          if s.prec(px,py):
+            print(px,'\prec',py)
+            return False
+    return True
 
 
 # Random Graphs via 'Generalized Percolation'
@@ -405,6 +443,7 @@ class tn:
     # just use tn as its own iterator or sequence type to random.choices()  say
     # which passes cumulative weights
 
+inequivPrecur = 4,8
 
 def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
 #   print('i j bit_num')
@@ -421,3 +460,21 @@ def popcount(n): return b.bit_count() #!!
 # First comment suggests that this is not completely terrible??!
 # Python 3.10 has more native popcount?
 # Just use this for now and profile (12jul022)
+
+if __name__=='__main__':
+  Graph.nl = True
+  Graph.size = 's'
+
+  #inPr = 0b001011001000010001000
+  #inPr = 0b0010110001011001000010001000
+  inPr = 0b001001010010110001011001000010001000
+  inequivPrecur = Graph(9,inPr) #(1<<12)+(1<<7)+8)
+  print(inequivPrecur, end='\n\n')
+
+  cs = Graph(3,1)
+  print('cs=', cs)
+  cs._dumpState()
+  print(cs.automorphism((1,2,0)))
+
+  print(inequivPrecur.automorphism((3,4,5,6,7,8,0,1,2)))
+  print(inequivPrecur.automorphism((1,2,0,4,5,3,7,8,6)))
