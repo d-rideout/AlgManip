@@ -304,7 +304,10 @@ class Graph:
       print('graphviz output of large graphs not implemented yet')
       return
     if s.gr==None: s._buildBinRep()
-    if not s.sbs or s.sbs[-1]!='r': s.transReduce() # too wonky? (12jan023)
+    if not s.sbs or s.sbs[-1]!='r':
+      if not s.transReduce(): # too wonky? (12jan023)
+        print("transitive reduction failed -- aborting writeDag")
+        return
     if not fnr: fnr = f'dag{s.n:04}' #.dot'
     fp = open(fnr+'.dot', 'w', newline='')
     fp.write('digraph "'+fnr+'" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
@@ -343,19 +346,38 @@ class Graph:
 
   def transReduce(s):
     'Compute transitive reduction of graph interpreted as a dag'
+    # def pstx(x):
+    #   'return int which is 1 in past(x) region'
+    #   return 1<<x*(x+1)//2-1
     if s.sbs and s.sbs[-1] == 'r': return
     if s.sbs == 'u': print('Unknown transitive closure state -- assuming the worst')
     if s.sbs != 'tc': s.transClose()
 #     elif s.tc == 'u': print("WARNING: Unknown transitive closure state -- transitive reduction may be incorrect")
     if s.size != 'm':
       print("Transitive reduction of non-medium graphs not implemented yet")
-      return
+      return False
     s.grr = deepcopy(s.gr)
     for j in range(s.n-1,1,-1): # i < j
       for i in range(j-1, 0, -1):
         try:
+          #if s.size=='m':
           if 1<<i & s.grr[j]: s.grr[j] &= ~s.grr[i] # note that relation should be irreflexive
+          #else: pass
+            # below is wrong.  Want to subtract past(i) from j.  z picks out past(i), but then it needs to be shifted up to j and then subtracted
+            # if i2bit(i,j):
+            #   z = (1<<i*(i+1)//2) - (1<<i*(i-1)//2)
+            #   # print(bin(z), bin(s.grr&z), bin(~(s.grr&z)))
+            #   # s.grr &= ~(s.grr&z)
+            #   s.grr &= s.grr^z
         except IndexError: print('index error:', i,j)
+
+  def npst(s, x):
+    'return cardinality of past(x)'
+    assert s.size=='s'
+    np = 0
+    for i in range(x):
+      if s.prec(i,x): np += 1
+    return np
 
   def automorphism(s, phi):
     '''Is phi an automorphism?
@@ -380,9 +402,28 @@ class Graph:
 
   def aut(s):
     'print automorphism group of graph'
-    # using brute force for now
-    for phi in permutations(range(s.n)):
-      if s.automorphism(phi): print(phi)
+    # Compute cardinality of pasts
+    npsts = {}
+    for x in range(s.n):
+      n = s.npst(x)
+      #npst.append(s.npst(x))
+      if n in npsts: npsts[n].append(x)
+      else: npsts[n] = [x]
+    print(npsts)
+
+    # Cycle through permutations of 'level sets'
+    phi = [None]*s.n
+    for np in npsts:
+      print('np=', np)
+      for npp in permutations(npsts[np]):
+        print(npp)
+        for i,v in zip(npsts[np],npp):
+          print('i,v=', i,v)
+          phi[i] = v
+        # ... I need to build a generator function which loops over these permutations.
+        yield here or something
+    # for phi in permutations(range(s.n)):
+    #   if s.automorphism(phi): print(phi)
 
 
 # Random Graphs via 'Generalized Percolation'
@@ -490,7 +531,7 @@ if __name__=='__main__':
     print(inPr)
     #print(inequivPrecur.automorphism((3,4,5,6,7,8,0,1,2)))
     #print(inequivPrecur.automorphism((1,2,0,4,5,3,7,8,6)))
-    #inPr.aut()
+    inPr.aut()
 
     inPr.writeDag()
   else:
@@ -500,3 +541,12 @@ if __name__=='__main__':
     print(cs.automorphism((1,2,0,3)))
     cs.aut()
     cs.writeDag()
+
+# def pstx(x):
+#       'return int which is 1 in past(x) region'
+#       return (1<<x*(x+1)//2) - (1<<x*(x-1)//2)
+# for x in range(1,5):
+#   big = (1<<x*(x+1)//2)-1
+#   lit = (1<<x*(x-1)//2)-1
+#   print(x, bin(big), bin(lit), bin(big-lit),
+#                            bin(pstx(x)))
