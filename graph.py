@@ -11,6 +11,7 @@ import random as rm        # to generate random graphs
 import fractions as fm     # python standard numbers
 import math as mm          # e.g. log
 from copy import deepcopy
+from itertools import permutations
 
 # Trying to understand all this module path business:
 # import sys
@@ -354,26 +355,32 @@ class Graph:
     Possibly making numerous unstated assumptions.  e.g. not checking input.
     phi is 'list' of natural number labels (i.e. a permutation)'''
     # assuming binary storage for now
-    print('Is', map, 'an automorphism?')
+    #print('Is', map, 'an automorphism?')
     for y in range(1,s.n):
       for x in range(y):
         px, py = phi[x],phi[y]
-        print(x,y, s.prec(x,y), end=' : ')
-        print(px,py)
+        #print(x,y, s.prec(x,y), end=' : ')
+        #print(px,py)
         if s.prec(x,y):
           if px>py: return False
           if not s.prec(px,py): return False
         else:
           if px>py: px,py = py,px
           if s.prec(px,py):
-            print(px,'\prec',py)
+            #print(px,'\prec',py)
             return False
     return True
+
+  def aut(s):
+    'print automorphism group of graph'
+    # using brute force for now
+    for phi in permutations(range(s.n)):
+      if s.automorphism(phi): print(phi)
 
 
 # Random Graphs via 'Generalized Percolation'
 # (aka 'CSG models', ala Rideout & Sorkin 1999)
-# See also Bucicovschi & Meyer & Rideout 2022???
+# See also Bucicovschi & Meyer & Rideout 2023???
 class tn:
   '''sequence (t_n \geq 0) (in decreasing order of chainlikeness?)
   const\tt_n = 1\t\t(default)
@@ -465,16 +472,24 @@ if __name__=='__main__':
   Graph.nl = True
   Graph.size = 's'
 
-  #inPr = 0b001011001000010001000
-  #inPr = 0b0010110001011001000010001000
-  inPr = 0b001001010010110001011001000010001000
-  inequivPrecur = Graph(9,inPr) #(1<<12)+(1<<7)+8)
-  print(inequivPrecur, end='\n\n')
+  if True:
+    #inPr = 0b001011001000010001000
+    #inPr = 0b0010110001011001000010001000
+    inPr9 = 0b001001010010110001011001000010001000
+    inPr10 = 0b110110111001001010010110001011001000010001000
+    inPr11 = 0b0011011111110110111001001010010110001011001000010001000
+    inPr12 = 0b001011011110011011111110110111001001010010110001011001000010001000
+    inPr = Graph(12, inPr12)
+    inPr.st = 'tc'
+    print(inPr)
+    #print(inequivPrecur.automorphism((3,4,5,6,7,8,0,1,2)))
+    #print(inequivPrecur.automorphism((1,2,0,4,5,3,7,8,6)))
+    inPr.aut()
 
-  cs = Graph(3,1)
-  print('cs=', cs)
-  cs._dumpState()
-  print(cs.automorphism((1,2,0)))
-
-  print(inequivPrecur.automorphism((3,4,5,6,7,8,0,1,2)))
-  print(inequivPrecur.automorphism((1,2,0,4,5,3,7,8,6)))
+    inPr.writeDag()
+  else:
+    cs = Graph(4,0b011110)
+    print('cs=', cs)
+    cs._dumpState()
+    print(cs.automorphism((1,2,0,3)))
+    cs.aut()
