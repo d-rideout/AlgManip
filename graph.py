@@ -92,7 +92,7 @@ class Graph:
        in: inbound edge set
        out: outbound edge set
        edge sets stored by names -- natural labels may change
-  st : state of binary edge storage
+  sbs : state of binary edge storage
        (edges stored in nd are those that have been explicitly declared)
        (gr=None) : no binary storage
        None : none of the below
@@ -120,7 +120,7 @@ class Graph:
   def __init__(s, n=0, gr=None):
     '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
     gr can be an int for a small graph, or a list of ints for a large graph
-    Please update st instance attribute (state of binary edge storage) after edges are added, if known (and n>2)
+    Please update sbs instance attribute (state of binary edge storage) after edges are added, if known (and n>2)
 
     Even in the case of nl, the graph size may not be known at time of construction!'''
     #     assert s.size == size, "global size disagrees with class size"
@@ -147,8 +147,8 @@ class Graph:
       s.nn = []
       s.nd = {}
     s.n = n
-    if n>2: s.st = 'u'
-    else: s.st = 'tcr'
+    if n>2: s.sbs = 'u'
+    else: s.sbs = 'tcr'
     s.gr = gr
     if s.size != 'm':
       print("WARNING: Some graph methods may implicitly assume Graph.size == 'm'?")
@@ -252,7 +252,7 @@ class Graph:
     """Add directed edge from node x to node y"""
 #     coding 'generic' version first"""
     print(f"[{x}] \prec [{y}]")
-    s.st = 'u' # I don't see how to avoid this easily?
+    s.sbs = 'u' # I don't see how to avoid this easily?
                # Should we have some convention when nl == True?? (12jan023)
     if s.nl: # if using natural labels to identify nodes
       s[y] |= 1<<x # This assumes size=='m'!
@@ -300,23 +300,30 @@ class Graph:
     ast = string to add to dot file : Please add '#' to beginning of comments!
     Uses grr instead of gr.  Is this a problem??'''
     # dag ==> digraph.  Separate method writeG() can output undirected graph
-    if s.size!='m':
-      print('graphviz output of non-medium graphs not implemented yet')
+    if s.size=='l':
+      print('graphviz output of large graphs not implemented yet')
       return
     if s.gr==None: s._buildBinRep()
-    if not s.st or s.st[-1]!='r': s.transReduce() # too wonky? (12jan023)
+    if not s.sbs or s.sbs[-1]!='r': s.transReduce() # too wonky? (12jan023)
     if not fnr: fnr = f'dag{s.n:04}' #.dot'
     fp = open(fnr+'.dot', 'w', newline='')
     fp.write('digraph "'+fnr+'" {\n rankdir=BT; concentrate=true; node[shape=plaintext];\n')
     if s.nn:
-      for i, nn in enumerate(s.nn): fp.write(f'{i} [label="{nn}"]\n')
+      for i, nn in enumerate(s.nn):
+        if nn: fp.write(f'{i} [label="{nn}"]\n')
+        else: fp.write(f'{i}\n')
     for x in range(s.n):
-      w = s.grr[x]
-      if w:
-        for b in range(w.bit_length()):
-          if 1<<b & w: fp.write(f'{b}->{x}; ')
+      if s.size=='m':
+        w = s.grr[x]
+        if w:
+          for b in range(w.bit_length()):
+            if 1<<b & w: fp.write(f'{b}->{x}; ')
+          fp.write('\n')
+        else: fp.write(f'{x};\n') # PERF: sometimes redundant
+      else:
+        for w in range(x):
+          if s.prec(w,x): fp.write(f'{w}->{x}; ')
         fp.write('\n')
-      else: fp.write(f'{x};\n') # PERF: sometimes redundant
     if ast: fp.write(ast+'\n')
     fp.write('}\n')
     print(f'time dot -Tpdf -o {fnr}.pdf {fnr}.dot')
@@ -336,9 +343,9 @@ class Graph:
 
   def transReduce(s):
     'Compute transitive reduction of graph interpreted as a dag'
-    if s.st and s.st[-1] == 'r': return
-    if s.st == 'u': print('Unknown transitive closure state -- assuming the worst')
-    if s.st != 'tc': s.transClose()
+    if s.sbs and s.sbs[-1] == 'r': return
+    if s.sbs == 'u': print('Unknown transitive closure state -- assuming the worst')
+    if s.sbs != 'tc': s.transClose()
 #     elif s.tc == 'u': print("WARNING: Unknown transitive closure state -- transitive reduction may be incorrect")
     if s.size != 'm':
       print("Transitive reduction of non-medium graphs not implemented yet")
@@ -450,7 +457,6 @@ class tn:
     # just use tn as its own iterator or sequence type to random.choices()  say
     # which passes cumulative weights
 
-inequivPrecur = 4,8
 
 def i2bit(i,j): return j*(j-1)//2+i  # Map from pair of indices i<j to bit
 #   print('i j bit_num')
@@ -480,11 +486,11 @@ if __name__=='__main__':
     inPr11 = 0b0011011111110110111001001010010110001011001000010001000
     inPr12 = 0b001011011110011011111110110111001001010010110001011001000010001000
     inPr = Graph(12, inPr12)
-    inPr.st = 'tc'
+    inPr.sbs = 'tc'
     print(inPr)
     #print(inequivPrecur.automorphism((3,4,5,6,7,8,0,1,2)))
     #print(inequivPrecur.automorphism((1,2,0,4,5,3,7,8,6)))
-    inPr.aut()
+    #inPr.aut()
 
     inPr.writeDag()
   else:
@@ -493,3 +499,4 @@ if __name__=='__main__':
     cs._dumpState()
     print(cs.automorphism((1,2,0,3)))
     cs.aut()
+    cs.writeDag()
