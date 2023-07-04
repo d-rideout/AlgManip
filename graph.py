@@ -11,7 +11,7 @@ import random as rm        # to generate random graphs
 import fractions as fm     # python standard numbers
 import math as mm          # e.g. log
 from copy import deepcopy
-from itertools import permutations
+from itertools import permutations # docs.python.org/3/library/itertools.html#itertools.permutations
 
 # Trying to understand all this module path business:
 # import sys
@@ -80,6 +80,7 @@ class Graph:
   size : 'm|s|l' maybe, see above comments for some discussion
   nl   : assume application code knows natural labeling (though not necessarily
          number of nodes!)
+  verb : verbose output
 
   Instance attributes: (not necessarily defined for a given instance)
   n  : number of vertices/nodes/elts
@@ -104,10 +105,12 @@ class Graph:
 #   tc : Is graph(?) transitively closed? ('u' for unknown(?)) [deprecated (12jan023)]
 
   Class methods:
-  writeDag    : write dot file (just hard coding dag aspect for now (16nov022))
-  transClose  : assuming dag, add all relations/edges implied by transitivity
-  transReduce : assuming dag, remove all relations/edges implied by transitivity (transClose first!)
+  writeDag     : write dot file (just hard coding dag aspect for now (16nov022))
+  transClose   : assuming dag, add all relations/edges implied by transitivity
+  transReduce  : assuming dag, remove all relations/edges implied by transitivity (transClose first!)
   automorphism : Is map an automorphism?
+  aut          : print automorphism group of graph
+  natlab       : list natural labelings of causet
 
   If you have a natural labeling of a causet,
   use it to populate nn and gr directly (and set nl=True).
@@ -116,6 +119,7 @@ class Graph:
   dg = True
   size = 'm'
   nl = False
+  verb = True
 
   def __init__(s, n=0, gr=None):
     '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
@@ -127,10 +131,11 @@ class Graph:
     if s.dg: directed = ' directed '
     else: directed = ' '
     if s.nl:
-      print("Constructing"+directed+"graph assuming known labeling")
-      if n==0: print("... with default n=0: Consider adding nodes via addNode() method.")
-        #print("Using natural labeling but with unknown n.  Please add nodes via addNode() method")
-        #print("WARNING: nl causets are not guaranteed to learn their true size from the edges alone")
+      if s.verb:
+        print("Constructing"+directed+"graph assuming known labeling")
+        if n==0: print("... with default n=0: Consider adding nodes via addNode() method.")
+          #print("Using natural labeling but with unknown n.  Please add nodes via addNode() method")
+          #print("WARNING: nl causets are not guaranteed to learn their true size from the edges alone")
       if gr==None:
         if s.size=='m': gr = [0]*n
         elif s.size=='s': gr = 0
@@ -150,7 +155,7 @@ class Graph:
     if n>2: s.sbs = 'u'
     else: s.sbs = 'tcr'
     s.gr = gr
-    if s.size != 'm':
+    if s.size != 'm' and s.verb:
       print("WARNING: Some graph methods may implicitly assume Graph.size == 'm'?")
 
   def __getitem__(s, i):
@@ -274,7 +279,7 @@ class Graph:
 #     s.tc = False  Why is this commented?? (15jan023)
 
   def prec(s, x, y):
-    'fast query for small graphs?  Assumes x<y.'
+    'fast query of x \prec y for small graphs?  Assumes x<y.'
     # PERF: include order check??
     return s.gr & 1<<i2bit(x,y)
 
@@ -349,6 +354,14 @@ class Graph:
     # def pstx(x):
     #   'return int which is 1 in past(x) region'
     #   return 1<<x*(x+1)//2-1
+    # def pstx(x):
+    #       'return int which is 1 in past(x) region'
+    #       return (1<<x*(x+1)//2) - (1<<x*(x-1)//2)
+    # for x in range(1,5):
+    #   big = (1<<x*(x+1)//2)-1
+    #   lit = (1<<x*(x-1)//2)-1
+    #   print(x, bin(big), bin(lit), bin(big-lit),
+    #                            bin(pstx(x)))
     if s.sbs and s.sbs[-1] == 'r': return
     if s.sbs == 'u': print('Unknown transitive closure state -- assuming the worst')
     if s.sbs != 'tc': s.transClose()
@@ -424,6 +437,20 @@ class Graph:
         yield here or something
     # for phi in permutations(range(s.n)):
     #   if s.automorphism(phi): print(phi)
+
+  def natlab(s):
+    'compute natural labelings of causet'
+    # precompute list of links
+    links = []
+    for y in range(1, s.n):
+      for x in range(y):
+        if s.prec(x,y): links.append((x,y))
+    # consider every possible labeling ...
+    for p in permutations(range(s.n)):
+      for x,y in links:
+        if p[x]>p[y]: break
+      else:
+        print(p)
 
 
 # Random Graphs via 'Generalized Percolation'
@@ -541,12 +568,3 @@ if __name__=='__main__':
     print(cs.automorphism((1,2,0,3)))
     cs.aut()
     cs.writeDag()
-
-# def pstx(x):
-#       'return int which is 1 in past(x) region'
-#       return (1<<x*(x+1)//2) - (1<<x*(x-1)//2)
-# for x in range(1,5):
-#   big = (1<<x*(x+1)//2)-1
-#   lit = (1<<x*(x-1)//2)-1
-#   print(x, bin(big), bin(lit), bin(big-lit),
-#                            bin(pstx(x)))
