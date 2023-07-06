@@ -1,24 +1,45 @@
-# * dict could just be an int, but leave it for future expansion 5jul023
-# * I probably want the causets to be dicts, so that I can add aspects willy-nilly
-# * So then need separate docs for n?  Or can just use int for now? 5jul023
-- n: 0
+# We just provide links for now
+# We try to provide the cannonical labeling for each causet
+
+# Design decisions: (goal: max simplicity given flexibility)
+# * just n for 'global var'
+# * preceding doc for keyword defns
+# * one doc for all causets
+# * allow list for causet, and l: [list]
+
+# Questions:
+# * Do we want a global tcr default?
+l: list representation (to add fields)
+nm: name
+a: adjacency matrix
+sbs: state of binary storage
+ps: list of parents
+aut: automorphisms (null for trivial?)
+# Do I want to store alternate labelings?
+# labelings associated with path??
+---
+- 0
 #   sbs: tcr
 - [void, null, tcr]
-- n: 1
+- 1
 #   sbs: tcr
 - [1-chain, null, tcr]
-- n: 2
-  sbs: tcr
+- 2
+#   sbs: tcr
 - [2-chain, 1, tcr]
 - [2-antichain, 0, tcr]
-- n: 3
+- 3
 #   sbs: tr
 - [3-chain, 5, tr]
 - [V, 3, tcr]
 - [L, 1, tcr]
 - [Lambda, 6, tcr]
 - [3-antichain, 0, tcr]
-- n: 4
+- 4
 - [4-chain, 0b100101, tr]
 - [Y, 0b010101, tr]
 - [nu, 0b010011, tr]
+- [31, 0b000101, tr]
+- [diamond, 0b110011, tr]
+- [flower, 0b001011, tcr]
+- [V1, 0b000011, tcr]
