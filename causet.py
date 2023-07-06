@@ -4,6 +4,13 @@ import AlgManip.graph as gm
 
 debug = False
 
+# Is this general enough for util.py?
+class abbrevDict(dict):
+  'dict for abbreviations, which can handle unabbreviated keys'
+  def __getitem__(s,i):
+    if not i in s: return i
+    else: return super().__getitem__(i)
+
 # Always read poscau database upon import?
 # with open(dirname(__file__) + '/poscau.yaml', 'r') as fp:
 # nicer not to have to enclose everything in the with scope
@@ -18,7 +25,7 @@ kw = next(poscau)
 # for k in next(poscau): kw[k] =
 
 # Read causet abbreviations
-causetName = next(poscau)
+causetName = abbrevDict(next(poscau))
 getCauset = {}
 
 # Graph settings for small causets
@@ -37,7 +44,8 @@ def nextCauset():
     if debug: print('c=', c)
     if isinstance(c, int):
       n = c
-      print('\nn =', n)
+      if n: print()
+      print('n =', n)
     elif isinstance(c, dict):
       for k in c:
         if not k in kw: print('unrecognized key:', k)

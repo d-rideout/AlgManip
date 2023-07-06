@@ -23,26 +23,28 @@ aut: automorphisms (null for trivial?)
 # labelings associated with path??
 ---
 # causet abbreviations
-void: void
+# void: void
 1ch: 1-chain
 2ch: 2-chain
 2ach: 2-antichain
 3ch: 3-chain
-V: V
-L: L # == 21
+# V: V
+# L: L # == 21
 Lam: Lambda
 3ach: 3-antichain
 4ch: 4-chain
-Y: Y
-nu: nu
-31: 31
+# Y: Y
+# nu: nu
+# 31: 31
 dia: diamond
 flo: flower
-V1: V1
-inu: inu
-pi: pi # == 22
-L1: L1 # == 211
-iY: iY
+# V1: V1
+# inu: inu
+# pi: pi # == 22
+# L1: L1 # == 211
+# iY: iY
+# N: N
+bt: bowtie
 ---
 - 0
 #   sbs: tcr
@@ -73,3 +75,5 @@ iY: iY
 - [pi, 0b001100, tcr, [L]]
 - [L1, 1, tcr, [L, 3ach]]
 - [iY, 0b100110, tr, [Lam]]
+- [N, 0b001110, tcr, [Lam, L]]
+- [bt, 0b011110, tcr, [Lam]]
