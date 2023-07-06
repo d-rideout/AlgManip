@@ -59,10 +59,11 @@ class Bijections:
   def __str__(s):
     if s.t=='s': return s.bj
     else:
+      o = len(s.bj)+1 # attach to instance?
+      if o<2: return 'Id'
       for t in s.bj:
 #         print('Bijections.__str__:', t, '-->', end=' ')
         rv = ' '.join([_tup2st(t) for t in s.bj])
-        o = len(s.bj)+1 # attach to instance?
         if o>2: rv += f' o{o}' # order of 'group', even if it is not a group...
         return rv
 #       return ' '.join([hex(n)[2:] for n in s.b])
@@ -493,18 +494,23 @@ class Graph:
 
   def natlab(s):
     'compute natural labelings of causet'
+    if not s.n: return Bijections('none')
+    elif not s.gr: return Bijections(f'S{s.n}')
     # precompute list of links
     links = []
     for y in range(1, s.n):
       for x in range(y):
         if s.prec(x,y): links.append((x,y))
     # consider every possible labeling ...
-    for p in permutations(range(s.n)):
+    rv = []
+    perms = permutations(range(s.n))
+    next(perms)
+    for p in perms:
       for x,y in links:
         if p[x]>p[y]: break
-      else:
-        print(p)
-
+      else: rv.append(p)
+      #         print(p)
+    return Bijections(rv)
 
 # Random Graphs via 'Generalized Percolation'
 # (aka 'CSG models', ala Rideout & Sorkin 1999)

@@ -11,8 +11,6 @@
 # * allow list for causet, and l: [list]
 
 # Questions / Comments:
-# * Do we want a global tcr default?
-# * Can't use tuples for edge weights. 6jul023
 l: list representation (to add fields)
 nm: name
 a: adjacency matrix
@@ -23,45 +21,34 @@ aut: automorphisms (null for trivial?)
 # labelings associated with path??
 ---
 # causet abbreviations
-# void: void
 1ch: 1-chain
 2ch: 2-chain
 2ach: 2-antichain
 3ch: 3-chain
-# V: V
 # L: L # == 21
 Lam: Lambda
 3ach: 3-antichain
 4ch: 4-chain
-# Y: Y
-# nu: nu
-# 31: 31
 dia: diamond
 flo: flower
-# V1: V1
-# inu: inu
 # pi: pi # == 22
 # L1: L1 # == 211
-# iY: iY
-# N: N
 bt: bowtie
 Lam1: Lambda1
 iflo: iflower
 4ach: 4-antichain
 5ch: 5-chain
+Yp: Y-prime
+nup: nu-prime
 ---
 - 0
-#   sbs: tcr
 - [void, null, tcr, null]
 - 1
-#   sbs: tcr
 - [1ch, null, tcr, [void]]
 - 2
-#   sbs: tcr
 - [2ch, 1, tcr, [1ch]]
 - [2ach, 0, tcr, [1ch]]
 - 3
-#   sbs: tr
 - [3ch, 5, tr, [2ch]]
 - [V, 3, tcr, [2ch]]
 - [L, 1, tcr, [2ch, [2ach,2]]]
@@ -85,4 +72,7 @@ iflo: iflower
 - [iflo, 0b111000, tcr, [3ach]]
 - [4ach, 0, tcr, [3ach]]
 - 5
-- [5ch, 0b1000100101, tr, [4ch]]
+- [5ch,   0b1000100101, tr, [4ch]]
+- [tallY, 0b0100100101, tr, [4ch]]
+- [Yp,    0b0010100101, tr, [4ch, [Y,2]]]
+- [nup,   0b0001100101, tr, [4ch, nu]]

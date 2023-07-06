@@ -33,12 +33,14 @@ gm.Graph.size = 's'
 gm.Graph.nl = True
 gm.Graph.verb = False
 
+nc = None
 def nextCauset():
   # what to call this??  iterCauset??  but I don't want to imply completeness!
   # poscauTraverse??  pcTrav? 5jul023
   #for doc in poscau: print(type(doc), doc)
   # Do I want to use multiple docs?
   # global poscau -- seems not necessary
+  global nc # I think because I define it here before using it
   if debug: print('nextCauset():', poscau)
   for c in next(poscau):
     if debug: print('c=', c)
