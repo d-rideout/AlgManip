@@ -1,0 +1,24 @@
+# * dict could just be an int, but leave it for future expansion 5jul023
+# * I probably want the causets to be dicts, so that I can add aspects willy-nilly
+# * So then need separate docs for n?  Or can just use int for now? 5jul023
+- n: 0
+#   sbs: tcr
+- [void, null, tcr]
+- n: 1
+#   sbs: tcr
+- [1-chain, null, tcr]
+- n: 2
+  sbs: tcr
+- [2-chain, 1, tcr]
+- [2-antichain, 0, tcr]
+- n: 3
+#   sbs: tr
+- [3-chain, 5, tr]
+- [V, 3, tcr]
+- [L, 1, tcr]
+- [Lambda, 6, tcr]
+- [3-antichain, 0, tcr]
+- n: 4
+- [4-chain, 0b100101, tr]
+- [Y, 0b010101, tr]
+- [nu, 0b010011, tr]
