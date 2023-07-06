@@ -40,23 +40,30 @@ iflo: iflower
 5ch: 5-chain
 Yp: Y-prime
 nup: nu-prime
+scep: sceptre
+tf: tallflower
+Yt: Y-toe
 ---
+# list format: [abbrev, grr, sbs, parents, children]
+# Do I want to include the weight in both directions?  Seems so.
+# include automorphisms?  natural labelings?
 - 0
-- [void, null, tcr, null]
+- [void, null, tcr, null, [1ch]]
 - 1
-- [1ch, null, tcr, [void]]
+- [1ch, null, tcr, [void], [2ch,2ach]]
 - 2
-- [2ch, 1, tcr, [1ch]]
-- [2ach, 0, tcr, [1ch]]
+- [2ch, 1, tcr, [1ch], [3ch,V,L]]
+- [2ach, 0, tcr, [1ch], [[L,2],Lam,3ach]]
 - 3
-- [3ch, 5, tr, [2ch]]
-- [V, 3, tcr, [2ch]]
-- [L, 1, tcr, [2ch, [2ach,2]]]
-- [Lam, 6, tcr, [2ach]]
-- [3ach, 0, tcr, [2ach]]
+- [3ch, 5, tr, [2ch], [4ch,Y,nu,31]]
+- [V, 3, tcr, [2ch], [[nu,2],flo,dia,V1]]
+- [L, 1, tcr, [2ch, [2ach,2]], [31,V1,inu,pi,N,L1]]
+- [Lam, 6, tcr, [2ach], [[N,2],bt,iY,Lam1]]
+- [3ach, 0, tcr, [2ach], [[L1,3],[Lam1,3],iflo,4ach]]
 - 4
-- [4ch, 0b100101, tr, [3ch]]
-- [Y, 0b010101, tr, [3ch]]
+- [4ch, 0b100101, tr, [3ch], [5ch,tallY,Yp,nup,41]]
+- [Y, 0b010101, tr, [3ch], [[Yp,2],scep,tf,Yt, Y1]]
+# flesh out stage 4 below before attempting to populate children lists
 - [nu, 0b010011, tr, [3ch, [V,2]]]
 - [31, 0b000101, tr, [3ch, L]]
 - [dia, 0b110011, tr, [V]]
@@ -76,3 +83,6 @@ nup: nu-prime
 - [tallY, 0b0100100101, tr, [4ch]]
 - [Yp,    0b0010100101, tr, [4ch, [Y,2]]]
 - [nup,   0b0001100101, tr, [4ch, nu]]
+- [41,    0b0000100101, tr, [4ch, 31]]
+- [scep,  0b1100010101, tr, [Y]]
+- [tf,    0b0010010101, tr, [Y]]
