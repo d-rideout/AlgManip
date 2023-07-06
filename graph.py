@@ -121,7 +121,7 @@ class Graph:
   nl = False
   verb = True
 
-  def __init__(s, n=0, gr=None):
+  def __init__(s, n=0, gr=None, sbs=None):
     '''Please pass number of nodes n if it is known, otherwise it defaults to 0.
     gr can be an int for a small graph, or a list of ints for a large graph
     Please update sbs instance attribute (state of binary edge storage) after edges are added, if known (and n>2)
@@ -152,11 +152,11 @@ class Graph:
       s.nn = []
       s.nd = {}
     s.n = n
-    if n>2: s.sbs = 'u'
+    if sbs: s.sbs = sbs
+    elif n>2: s.sbs = 'u'
     else: s.sbs = 'tcr'
     s.gr = gr
-    if s.size != 'm' and s.verb:
-      print("WARNING: Some graph methods may implicitly assume Graph.size == 'm'?")
+    if s.size != 'm' and s.verb: print("WARNING: Some graph methods may implicitly assume Graph.size == 'm'?")
 
   def __getitem__(s, i):
     assert s.size=='m', "currently assumes medium graphs"
