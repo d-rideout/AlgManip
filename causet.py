@@ -44,8 +44,9 @@ def nextCauset():
     if debug: print('c=', c)
     if isinstance(c, int):
       n = c
-      if n: print()
+      if n: print(nc, 'causets\n')
       print('n =', n)
+      nc = 0
     elif isinstance(c, dict):
       for k in c:
         if not k in kw: print('unrecognized key:', k)
@@ -55,6 +56,7 @@ def nextCauset():
       #       if len(c)==4: yield c[0], gm.Graph(n,c[1], c[2]), c[3]
       #       else: yield c[0], gm.Graph(n,c[1], c[2]), None
       getCauset[c[0]] = (causetName[c[0]], n, c[1], c[2], c[3])
+      nc += 1
       yield c[0], gm.Graph(n,c[1], c[2]), c[3]
   print('...')
 

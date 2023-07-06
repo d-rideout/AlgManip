@@ -10,9 +10,9 @@
 # * one doc for all causets
 # * allow list for causet, and l: [list]
 
-# Questions:
+# Questions / Comments:
 # * Do we want a global tcr default?
-# * Do we want a more compact name for causets?
+# * Can't use tuples for edge weights. 6jul023
 l: list representation (to add fields)
 nm: name
 a: adjacency matrix
@@ -45,6 +45,7 @@ flo: flower
 # iY: iY
 # N: N
 bt: bowtie
+Lam1: Lambda1
 ---
 - 0
 #   sbs: tcr
@@ -60,20 +61,21 @@ bt: bowtie
 #   sbs: tr
 - [3ch, 5, tr, [2ch]]
 - [V, 3, tcr, [2ch]]
-- [L, 1, tcr, [2ch, 2ach]]
+- [L, 1, tcr, [2ch, [2ach,2]]]
 - [Lam, 6, tcr, [2ach]]
 - [3ach, 0, tcr, [2ach]]
 - 4
 - [4ch, 0b100101, tr, [3ch]]
 - [Y, 0b010101, tr, [3ch]]
-- [nu, 0b010011, tr, [3ch, V]]
+- [nu, 0b010011, tr, [3ch, [V,2]]]
 - [31, 0b000101, tr, [3ch, L]]
 - [dia, 0b110011, tr, [V]]
 - [flo, 0b001011, tcr, [V]]
 - [V1, 0b000011, tcr, [V, L]]
 - [inu, 0b101100, tr, [L]]
 - [pi, 0b001100, tcr, [L]]
-- [L1, 1, tcr, [L, 3ach]]
+- [L1, 1, tcr, [L, [3ach,3]]]
 - [iY, 0b100110, tr, [Lam]]
-- [N, 0b001110, tcr, [Lam, L]]
+- [N, 0b001110, tcr, [[Lam,2], L]]
 - [bt, 0b011110, tcr, [Lam]]
+- [Lam1, 6, tcr, [Lam, [3ach, 3]]]
