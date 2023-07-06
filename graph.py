@@ -28,34 +28,44 @@ import AlgManip.util as um
 debug = False
 # debug = True
 
-# Is this general enough to warrant not being internal?
-# Yes - user will likely need it.
-# general enough to go into util.py?
-# No - wait until some other module needs it.
-def tup2hex(tup):
-  'convert tuple to hex int, with high end first'
-  n = 0
-  s = 0
-  for h in tup[::-1]:
-    n += h<<s
-    s += 4
-  return n
+# # Is this general enough to warrant not being internal?
+# # Yes - user will likely need it.
+# # general enough to go into util.py?
+# # No - wait until some other module needs it.
+# def tup2hex(tup):
+#   'convert tuple to hex int, with high end first'
+#   n = 0
+#   s = 0
+#   for h in tup[::-1]:
+#     n += h<<s
+#     s += 4
+#   return n
 
-class Bijections(tuple): # why am I subclassing tuple??
+def _tup2st(t):
+  ts = ''
+  for x in t: ts += str(x)
+  return ts
+
+class Bijections:
   'class to manage collections of bijective maps'
-  The constructor here needs to take the original tuples.
-  So it can get n.
-  Can store tuples or ints
-  (leading 0's are suppressed on output of ints!)
+  # Use ints to store tuples?
+  # leading 0's are suppressed on output of ints!
+  # But it should be a lot more space efficient? 6jul023
   def __init__(s, x):
-    'construct with either a string or a list of ints?'
+    'construct with either a string or a list of tuples'
     if isinstance(x, str): s.t = 's'
-    else: s.t = 'l'
-    s.b = x
+    else: s.t = 'lt'
+    s.bj = x
   def __str__(s):
-    if s.t=='s': return s.b
+    if s.t=='s': return s.bj
     else:
-      return ' '.join([hex(n)[2:] for n in s.b])
+      for t in s.bj:
+#         print('Bijections.__str__:', t, '-->', end=' ')
+        rv = ' '.join([_tup2st(t) for t in s.bj])
+        o = len(s.bj)+1 # attach to instance?
+        if o>2: rv += f' o{o}' # order of 'group', even if it is not a group...
+        return rv
+#       return ' '.join([hex(n)[2:] for n in s.b])
 #       rv = ''
 #       for n in s.b: rv += hex(n)
 
@@ -450,7 +460,7 @@ class Graph:
     return True
 
   def aut(s):
-    'return automorphism group of graph'
+    'return automorphism group of graph, as Bijections instance'
     if not s.gr: return Bijections(f'S{s.n}')
 #     # Compute cardinality of pasts
 #     npsts = {}
@@ -476,8 +486,8 @@ class Graph:
     perms = permutations(range(s.n))
     next(perms) # ignore identity
     for phi in perms:
-      if s.automorphism(phi): rv.append(tup2hex(phi))
-    print('Graph.aut:', rv)
+      if s.automorphism(phi): rv.append(phi)
+#     print('Graph.aut:', rv)
     if rv: return Bijections(rv)
     else: return Bijections('Id')
 

@@ -46,6 +46,9 @@ flo: flower
 # N: N
 bt: bowtie
 Lam1: Lambda1
+iflo: iflower
+4ach: 4-antichain
+5ch: 5-chain
 ---
 - 0
 #   sbs: tcr
@@ -79,3 +82,7 @@ Lam1: Lambda1
 - [N, 0b001110, tcr, [[Lam,2], L]]
 - [bt, 0b011110, tcr, [Lam]]
 - [Lam1, 6, tcr, [Lam, [3ach, 3]]]
+- [iflo, 0b111000, tcr, [3ach]]
+- [4ach, 0, tcr, [3ach]]
+- 5
+- [5ch, 0b1000100101, tr, [4ch]]
