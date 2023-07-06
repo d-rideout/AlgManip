@@ -1,5 +1,8 @@
 # We just provide links for now
 # We try to provide the cannonical labeling for each causet
+# Note that cannonical labeling based on links will likely be different from
+# canonical labeling based on relations!  I choose the former for now, even
+# though that is a non-standard choice. 5jul023
 
 # Design decisions: (goal: max simplicity given flexibility)
 # * just n for 'global var'
@@ -9,6 +12,7 @@
 
 # Questions:
 # * Do we want a global tcr default?
+# * Do we want a more compact name for causets?
 l: list representation (to add fields)
 nm: name
 a: adjacency matrix
@@ -18,28 +22,37 @@ aut: automorphisms (null for trivial?)
 # Do I want to store alternate labelings?
 # labelings associated with path??
 ---
+# causet abbreviations
+1ch: 1-chain
+2ch: 2-chain
+2ach: 2-antichain
+3ch: 3-chain
+V: V
+L: L
+---
 - 0
 #   sbs: tcr
-- [void, null, tcr]
+- [void, null, tcr, null]
 - 1
 #   sbs: tcr
-- [1-chain, null, tcr]
+- [1-chain, null, tcr, [void]]
 - 2
 #   sbs: tcr
-- [2-chain, 1, tcr]
-- [2-antichain, 0, tcr]
+- [2-chain, 1, tcr, [1ch]]
+- [2-antichain, 0, tcr, [1ch]]
 - 3
 #   sbs: tr
-- [3-chain, 5, tr]
-- [V, 3, tcr]
-- [L, 1, tcr]
-- [Lambda, 6, tcr]
-- [3-antichain, 0, tcr]
+- [3-chain, 5, tr, [2ch]]
+- [V, 3, tcr, [2ch]]
+- [L, 1, tcr, [2ch, 2ach]]
+- [Lambda, 6, tcr, [2ach]]
+- [3-antichain, 0, tcr, [2ach]]
 - 4
-- [4-chain, 0b100101, tr]
-- [Y, 0b010101, tr]
-- [nu, 0b010011, tr]
-- [31, 0b000101, tr]
-- [diamond, 0b110011, tr]
-- [flower, 0b001011, tcr]
-- [V1, 0b000011, tcr]
+- [4-chain, 0b100101, tr, [3ch]]
+- [Y, 0b010101, tr, [3ch]]
+- [nu, 0b010011, tr, [3ch, V]]
+- [31, 0b000101, tr, [3ch, L]]
+- [diamond, 0b110011, tr, [V]]
+- [flower, 0b001011, tcr, [V]]
+- [V1, 0b000011, tcr, [V, L]]
+- [inu, 0b101100, tr, [L]]

@@ -17,6 +17,9 @@ kw = next(poscau)
 # print(next(poscau))
 # for k in next(poscau): kw[k] =
 
+# Read causet abbreviations
+causetName = next(poscau)
+
 # Graph settings for small causets
 gm.Graph.size = 's'
 gm.Graph.nl = True
@@ -38,8 +41,9 @@ def nextCauset():
       for k in c:
         if not k in kw: print('unrecognized key:', k)
     else:
-#       print(c[0]) # name
-      yield c[0], gm.Graph(n,c[1], c[2])
+      # c += [None]*(3-len(c))
+      if len(c)==4: yield c[0], gm.Graph(n,c[1], c[2]), c[3]
+      else: yield c[0], gm.Graph(n,c[1], c[2]), None
   print('...')
 
 # Do we want these?
