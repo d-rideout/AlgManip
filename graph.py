@@ -28,6 +28,37 @@ import AlgManip.util as um
 debug = False
 # debug = True
 
+# Is this general enough to warrant not being internal?
+# Yes - user will likely need it.
+# general enough to go into util.py?
+# No - wait until some other module needs it.
+def tup2hex(tup):
+  'convert tuple to hex int, with high end first'
+  n = 0
+  s = 0
+  for h in tup[::-1]:
+    n += h<<s
+    s += 4
+  return n
+
+class Bijections(tuple): # why am I subclassing tuple??
+  'class to manage collections of bijective maps'
+  The constructor here needs to take the original tuples.
+  So it can get n.
+  Can store tuples or ints
+  (leading 0's are suppressed on output of ints!)
+  def __init__(s, x):
+    'construct with either a string or a list of ints?'
+    if isinstance(x, str): s.t = 's'
+    else: s.t = 'l'
+    s.b = x
+  def __str__(s):
+    if s.t=='s': return s.b
+    else:
+      return ' '.join([hex(n)[2:] for n in s.b])
+#       rv = ''
+#       for n in s.b: rv += hex(n)
+
 # What is a small graph?  oeis.org/A161680/list
 #  n nc2
 #  6  15
@@ -87,6 +118,7 @@ class Graph:
   gr : binary representation of graph (details depend on size above)
        (medium graphs hold useless 0 in gr[0])
   grr: transitively reduced binary representation
+  NOT SURE I AM HANDLING THIS PROPERLY IN causet.py!!!
   nn : node names (indexed by natural label, for output)
   nd : node_dict key name val dict keys [better to make .nd[x] node objects?]
        nl:natural label
@@ -418,29 +450,36 @@ class Graph:
     return True
 
   def aut(s):
-    'print automorphism group of graph'
-    # Compute cardinality of pasts
-    npsts = {}
-    for x in range(s.n):
-      n = s.npst(x)
-      #npst.append(s.npst(x))
-      if n in npsts: npsts[n].append(x)
-      else: npsts[n] = [x]
-    print(npsts)
-
-    # Cycle through permutations of 'level sets'
-    phi = [None]*s.n
-    for np in npsts:
-      print('np=', np)
-      for npp in permutations(npsts[np]):
-        print(npp)
-        for i,v in zip(npsts[np],npp):
-          print('i,v=', i,v)
-          phi[i] = v
-        # ... I need to build a generator function which loops over these permutations.
-        yield here or something
-    # for phi in permutations(range(s.n)):
-    #   if s.automorphism(phi): print(phi)
+    'return automorphism group of graph'
+    if not s.gr: return Bijections(f'S{s.n}')
+#     # Compute cardinality of pasts
+#     npsts = {}
+#     for x in range(s.n):
+#       n = s.npst(x)
+#       #npst.append(s.npst(x))
+#       if n in npsts: npsts[n].append(x)
+#       else: npsts[n] = [x]
+#     print(npsts)
+#
+#     # Cycle through permutations of 'level sets'
+#     phi = [None]*s.n
+#     for np in npsts:
+#       print('np=', np)
+#       for npp in permutations(npsts[np]):
+#         print(npp)
+#         for i,v in zip(npsts[np],npp):
+#           print('i,v=', i,v)
+#           phi[i] = v
+#         # ... I need to build a generator function which loops over these permutations.
+#         yield here or something
+    rv = []
+    perms = permutations(range(s.n))
+    next(perms) # ignore identity
+    for phi in perms:
+      if s.automorphism(phi): rv.append(tup2hex(phi))
+    print('Graph.aut:', rv)
+    if rv: return Bijections(rv)
+    else: return Bijections('Id')
 
   def natlab(s):
     'compute natural labelings of causet'
