@@ -23,36 +23,53 @@ aut: automorphisms (null for trivial?)
 # labelings associated with path??
 ---
 # causet abbreviations
+void: void
 1ch: 1-chain
 2ch: 2-chain
 2ach: 2-antichain
 3ch: 3-chain
 V: V
-L: L
+L: L # == 21
+Lam: Lambda
+3ach: 3-antichain
+4ch: 4-chain
+Y: Y
+nu: nu
+31: 31
+dia: diamond
+flo: flower
+V1: V1
+inu: inu
+pi: pi # == 22
+L1: L1 # == 211
+iY: iY
 ---
 - 0
 #   sbs: tcr
 - [void, null, tcr, null]
 - 1
 #   sbs: tcr
-- [1-chain, null, tcr, [void]]
+- [1ch, null, tcr, [void]]
 - 2
 #   sbs: tcr
-- [2-chain, 1, tcr, [1ch]]
-- [2-antichain, 0, tcr, [1ch]]
+- [2ch, 1, tcr, [1ch]]
+- [2ach, 0, tcr, [1ch]]
 - 3
 #   sbs: tr
-- [3-chain, 5, tr, [2ch]]
+- [3ch, 5, tr, [2ch]]
 - [V, 3, tcr, [2ch]]
 - [L, 1, tcr, [2ch, 2ach]]
-- [Lambda, 6, tcr, [2ach]]
-- [3-antichain, 0, tcr, [2ach]]
+- [Lam, 6, tcr, [2ach]]
+- [3ach, 0, tcr, [2ach]]
 - 4
-- [4-chain, 0b100101, tr, [3ch]]
+- [4ch, 0b100101, tr, [3ch]]
 - [Y, 0b010101, tr, [3ch]]
 - [nu, 0b010011, tr, [3ch, V]]
 - [31, 0b000101, tr, [3ch, L]]
-- [diamond, 0b110011, tr, [V]]
-- [flower, 0b001011, tcr, [V]]
+- [dia, 0b110011, tr, [V]]
+- [flo, 0b001011, tcr, [V]]
 - [V1, 0b000011, tcr, [V, L]]
 - [inu, 0b101100, tr, [L]]
+- [pi, 0b001100, tcr, [L]]
+- [L1, 1, tcr, [L, 3ach]]
+- [iY, 0b100110, tr, [Lam]]

@@ -188,6 +188,10 @@ class Graph:
         spc = ' '
     return rv
 
+  def __format__(s, fmt):
+    #print('format requested:', fmt)
+    return f'{str(s):{fmt}}'
+
   def _buildBinRep(s):
     'reconstruct binary representation of graph and nn[]'
     if debug: print('Reconstructing binary representation')

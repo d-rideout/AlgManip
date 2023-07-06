@@ -19,6 +19,7 @@ kw = next(poscau)
 
 # Read causet abbreviations
 causetName = next(poscau)
+getCauset = {}
 
 # Graph settings for small causets
 gm.Graph.size = 's'
@@ -40,10 +41,13 @@ def nextCauset():
     elif isinstance(c, dict):
       for k in c:
         if not k in kw: print('unrecognized key:', k)
+      print('dict-based causets not implemented yet')
     else:
-      # c += [None]*(3-len(c))
-      if len(c)==4: yield c[0], gm.Graph(n,c[1], c[2]), c[3]
-      else: yield c[0], gm.Graph(n,c[1], c[2]), None
+      c += [None]*(4-len(c)) # this is not super-safe: can forget elts in middle
+      #       if len(c)==4: yield c[0], gm.Graph(n,c[1], c[2]), c[3]
+      #       else: yield c[0], gm.Graph(n,c[1], c[2]), None
+      getCauset[c[0]] = (causetName[c[0]], n, c[1], c[2], c[3])
+      yield c[0], gm.Graph(n,c[1], c[2]), c[3]
   print('...')
 
 # Do we want these?
