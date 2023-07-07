@@ -1,11 +1,21 @@
-'''Fast graph module
+'''Fast 'Lorentzian-focused' graph module
 
-(The vertices of the graph are labeled with values taken from a poset, which
-is usually the natural numbers.  A partial ordering of the labels can
-be used to induce a partial order on the vertices, and thus, after transitive
-closure, convert the graph into a causal set.)'''
-# [How to handle spacelike vertices connected by an edge?
-# Just keep these as a second relation defined on the vertex set??]'''
+There are many graph packages available.  Most (or all?) are designed from what
+I call a "Riemannian" perspective, by which I essentially just mean that one
+first designs for generic graphs, and maybe, or maybe not, considers directed
+acyclic graphs (dags) as a relatively unimportant special case.  I want to
+design from what I call a "Lorentzian" perspective, in which dags are central,
+and generalizations to non-acyclic graphs are permitted, but are not regarded
+as a central use case.  The core design is intended to be optimized for
+handling acyclic directed graphs.
+
+The vertices of the graph are labeled with values taken from a poset, which is
+usually the natural numbers.  A partial ordering of the labels can be used to
+induce a partial order on the vertices, and thus, after transitive closure,
+assuming that the label order is everywhere consistent with the edge
+directions, convert the graph into a causal set.  (If unfamiliar, regard a
+causal set as a finite, transitively closed, dag.)'''
+
 import scipy.special as ss # binomial coefficients
 import random as rm        # to generate random graphs
 import fractions as fm     # python standard numbers
@@ -16,6 +26,7 @@ from itertools import permutations # docs.python.org/3/library/itertools.html#it
 # Trying to understand all this module path business:
 # import sys
 # print(sys.path)
+import AlgManip.permutation as pm
 import AlgManip.util as um
 # for m in sys.modules.keys():
 #   if m.__contains__('numpy'): continue
@@ -41,33 +52,35 @@ debug = False
 #     s += 4
 #   return n
 
+# Will this be needed elsewhere?
 def _tup2st(t):
+  'convert tuple to string of symbols, used in Bijections class'
   ts = ''
   for x in t: ts += str(x)
   return ts
 
-class Bijections:
+class Bijections(set):
   'class to manage collections of bijective maps'
   # Use ints to store maps?  Leading 0's are suppressed.  See tup2hex() above.
   # But it should be a lot more space efficient? 6jul023
   def __init__(s, x):
-    'construct with either a string or a list of tuples'
+    'construct with either a string or a set of tuples'
     if isinstance(x, str): s.t = 's'
     else: s.t = 'lt'
     s.bj = x
+  def __bool__(s): return bool(s.bj) # should empty tuple ==> false?
   def __str__(s):
     if s.t=='s': return s.bj
     else:
       o = len(s.bj)+1 # attach to instance?
-      if o<2: return 'Id'
+      if o<2: return 'Id' # identity is assumed to always be present
       for t in s.bj:
 #         print('Bijections.__str__:', t, '-->', end=' ')
         rv = ' '.join([_tup2st(t) for t in s.bj])
-        if o>2: rv += f' o{o}' # order of 'group', even if it is not a group...
+        if o>2: rv += f' o{o}' # num bijections (order of 'group')
         return rv
-#       return ' '.join([hex(n)[2:] for n in s.b])
-#       rv = ''
-#       for n in s.b: rv += hex(n)
+  def __repr__(s): print('This should be able to be written to a yaml file')
+
 
 # What is a small graph?  oeis.org/A161680/list
 #  n nc2
@@ -491,25 +504,43 @@ class Graph:
     if rv: return Bijections(rv)
     else: return Bijections('Id')
 
-  def natlab(s):
-    'compute natural labelings of causet'
+  def natlab(s, autG=None):
+    '''compute natural labelings of causet
+    optionally modulo automorphism group'''
+#     print('natlab(): autG =', autG)
+#     if autG: print('true')
+#     else: print('false')
+    
+    # antichains are trivially complicated
     if not s.n: return Bijections('none')
-    elif not s.gr: return Bijections(f'S{s.n}')
+    elif not s.gr:
+      if autG: return Bijections('Id')
+      else: return Bijections(f'S{s.n}')
+
     # precompute list of links
     links = []
     for y in range(1, s.n):
       for x in range(y):
         if s.prec(x,y): links.append((x,y))
-    # consider every possible labeling ...
-    rv = []
+
+    # loop over every possible labeling
+    rv = set() # set of permutations (tuples)
     perms = permutations(range(s.n))
-    next(perms)
-    for p in perms:
+    next(perms) # ignore identity
+    for l in perms:
       for x,y in links:
-        if p[x]>p[y]: break
-      else: rv.append(p)
-      #         print(p)
+        if l[x]>l[y]: break
+      else:
+        if autG: # Does gl already appear in rv, for some g \in autG
+          # multiply l by every g \in autG, and ask if it is in rv
+          for g in autG:
+            # if so then skip it
+            if g*l in rv: break
+            # as an added bonus, can ask which of the two are smaller, and keep the smaller.  This should yield a canonical representative of the labeling, rather than a representative which depends on this algorithm 7jul023
+          else: rv.add(l)
+        else: rv.add(l)
     return Bijections(rv)
+
 
 # Random Graphs via 'Generalized Percolation'
 # (aka 'CSG models', ala Rideout & Sorkin 1999)
