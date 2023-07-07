@@ -48,8 +48,8 @@ def nextCauset():
   # poscauTraverse??  pcTrav? 5jul023
   '''yield all causets in poscau, as 4-tuple:
   abbrev str, Graph instance, parents list, children list'''
-  # global poscau -- seems not necessary
-  global nc # because I define it here before using it
+  # global poscau -- not necessary because it is referenced before defined
+  global nc
   global n
   if debug: print('nextCauset():', poscau)
   for c in poscau: # next(poscau):
@@ -65,29 +65,19 @@ def nextCauset():
       print('dict-based causets not implemented yet')
     else:
       c += [None]*(5-len(c)) # this is not super-safe: can forget elts in middle
-      #       if len(c)==4: yield c[0], gm.Graph(n,c[1], c[2]), c[3]
-      #       else: yield c[0], gm.Graph(n,c[1], c[2]), None
       nc += 1
       yield c[0], gm.Graph(n,c[1], c[2]), c[3], c[4]
   print('...')
 
 def randWalk():
-  '''random walk through poscau, choosing edges uniformly at random
+  '''yield random walk through poscau, choosing edges uniformly at random
   (irrespective of edge weights)'''
   c = getCauset['void']
-  print('c =', c)
-  while c[5]:
-    print('  children =', c[5], tuple(c[5]))
-#     rc = rm.choices(tuple(c[5]))
+  while c:
+    yield c
+    print('  children =', c[5])
+    if not c[5]: return
     rc = rm.choices(c[5])
-    print('  rc =', rc[0])
     if isinstance(rc[0], list): rc = rc[0][0]
     else: rc = rc[0]
     c = getCauset[rc]
-    print(c)
-
-# Proposal:
-# * store structure of poscau in igraph?
-#   I am not sure that this is worthwhile at the moment.
-#   I fear it will add unnecessary confusion.  Better to just write my own code
-#   for now. 6jul023

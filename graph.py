@@ -48,8 +48,7 @@ def _tup2st(t):
 
 class Bijections:
   'class to manage collections of bijective maps'
-  # Use ints to store tuples?
-  # leading 0's are suppressed on output of ints!
+  # Use ints to store maps?  Leading 0's are suppressed.  See tup2hex() above.
   # But it should be a lot more space efficient? 6jul023
   def __init__(s, x):
     'construct with either a string or a list of tuples'

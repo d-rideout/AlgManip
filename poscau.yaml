@@ -44,6 +44,7 @@ scep: sceptre
 tf: tallflower
 Yt: Y-toe
 Ln: L-nugget # This is a standard counter-example
+flop: flower-prime
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # Do I want to include the weight in both directions?  Seems so.
@@ -71,8 +72,8 @@ Ln: L-nugget # This is a standard counter-example
 - [flo, 0b001011, tcr, [V]]
 - [V1, 0b000011, tcr, [V, L]]
 - [inu, 0b101100, tr, [L]]
-- [pi, 0b001100, tcr, [L]]
-- [L1, 1, tcr, [L, [3ach,3]]]
+- [pi, 0b001100, tcr, [L], [221]]
+- [L1, 1, tcr, [L, [3ach,3]], [L1]]
 - [iY, 0b100110, tr, [Lam]]
 - [N, 0b001110, tcr, [[Lam,2], L]]
 - [bt, 0b011110, tcr, [Lam]]
@@ -90,3 +91,8 @@ Ln: L-nugget # This is a standard counter-example
 - [Yt,    0b0001010101, tr, [Y, nu]]
 - [Y1,    0b0000010101, tr, [Y, 31]]
 - [Ln,    0b1100001101, tr, [nu]]
+- [goal,  0b0010100011, tr, [nu]]
+- [flop,  0b0001001101, tr, [nu, flo]]
+
+# path to spiral-crown
+- [221,   0b0000001100, tcr, [L1, pi], [222]]
