@@ -36,8 +36,8 @@ import AlgManip.util as um
 # # quit()
 # sys.exit()
 
-debug = False
-# debug = True
+# debug = False
+debug = True
 
 # # Is this general enough to warrant not being internal?
 # # Yes - user will likely need it.
@@ -54,31 +54,51 @@ debug = False
 
 # Will this be needed elsewhere?
 def _tup2st(t):
-  'convert tuple to string of symbols, used in Bijections class'
+  'convert tuple to string of symbols (used in Bijections class)'
   ts = ''
   for x in t: ts += str(x)
   return ts
+def _idtup(t):
+  'Is t an identity tuple? (used in Bijections class)'
+#   if debug: print('_idtup():', t, tuple(range(len(t))), t==tuple(range(len(t))))
+  return t == tuple(range(len(t)))
 
 class Bijections(set):
   'class to manage collections of bijective maps'
   # Use ints to store maps?  Leading 0's are suppressed.  See tup2hex() above.
   # But it should be a lot more space efficient? 6jul023
+  # store identity to facilitate 'in' queries, but omit from output
   def __init__(s, x):
     'construct with either a string or a set of tuples'
-    if isinstance(x, str): s.t = 's'
-    else: s.t = 'lt'
-    s.bj = x
+    # Probably should make x optional, and if none or so call super().__init__()
+#     s.i = n
+    if isinstance(x, str): s.t = 'st'
+    else: s.t = 'set'
+    if debug: print('building Bijections instance from', type(x))
+#     s.bj = x # should I just write s = x or something??
+    s = x # should I just write s = x or something??
   def __bool__(s): return bool(s.bj) # should empty tuple ==> false?
+#   def __contains__(s,x): if
+  def __iter__(s):
+    print('called __iter__')
+    return s.bj.__iter__()
   def __str__(s):
     if s.t=='s': return s.bj
     else:
-      o = len(s.bj)+1 # attach to instance?
+      o = len(s.bj)
       if o<2: return 'Id' # identity is assumed to always be present
+      #       n = len( -- how to check for identity, to remove it??
+      #       id = tuple(range(len(t)))
+      sep = ''
+      rv = ''
       for t in s.bj:
-#         print('Bijections.__str__:', t, '-->', end=' ')
-        rv = ' '.join([_tup2st(t) for t in s.bj])
-        if o>2: rv += f' o{o}' # num bijections (order of 'group')
-        return rv
+        if _idtup(t): continue
+#         if debug: print('Bijections.__str__:', t) #, '-->', end=' ')
+        # rv = ' '.join([_tup2st(t) for t in s.bj])
+        rv += sep+_tup2st(t)
+        sep = ' '
+      if o>2: rv += f' o{o}' # num bijections (order of 'group')
+      return rv
   def __repr__(s): print('This should be able to be written to a yaml file')
 
 
@@ -495,22 +515,24 @@ class Graph:
 #           phi[i] = v
 #         # ... I need to build a generator function which loops over these permutations.
 #         yield here or something
-    rv = []
+    rv = set()
     perms = permutations(range(s.n))
-    next(perms) # ignore identity
+    rv.add(next(perms)) # identity always in automorphism group
     for phi in perms:
-      if s.automorphism(phi): rv.append(phi)
-#     print('Graph.aut:', rv)
-    if rv: return Bijections(rv)
-    else: return Bijections('Id')
+      if s.automorphism(phi): rv.add(phi)
+      #     print('Graph.aut:', rv)
+    return Bijections(rv)
+  #     if rv:
+  #     else: return Bijections('Id')
 
   def natlab(s, autG=None):
     '''compute natural labelings of causet
     optionally modulo automorphism group'''
-#     print('natlab(): autG =', autG)
-#     if autG: print('true')
-#     else: print('false')
-    
+    if debug:
+      print('natlab(): autG =', autG, end=' : ')
+      if autG: print('true')
+      else: print('false')
+
     # antichains are trivially complicated
     if not s.n: return Bijections('none')
     elif not s.gr:
@@ -524,18 +546,27 @@ class Graph:
         if s.prec(x,y): links.append((x,y))
 
     # loop over every possible labeling
-    rv = set() # set of permutations (tuples)
     perms = permutations(range(s.n))
-    next(perms) # ignore identity
+#     next(perms) # ignore identity
+    rv = set() # set of permutations (tuples), identity always valid
+    rv.add(next(perms)) # tuple as element
     for l in perms:
+      if debug: print('considering', l)
       for x,y in links:
         if l[x]>l[y]: break
       else:
+        print('okay')
         if autG: # Does gl already appear in rv, for some g \in autG
+          if debug: print('is elt of Gl already included?')
           # multiply l by every g \in autG, and ask if it is in rv
           for g in autG:
+            if debug:
+              print('g:', type(g), type(l)) #, type(g*l))
+              print('g =', g, l, g*l)
             # if so then skip it
-            if g*l in rv: break
+            if g*l in rv:
+              print('yep')
+              break
             # as an added bonus, can ask which of the two are smaller, and keep the smaller.  This should yield a canonical representative of the labeling, rather than a representative which depends on this algorithm 7jul023
           else: rv.add(l)
         else: rv.add(l)
