@@ -74,12 +74,15 @@ class Bijections(set):
     if isinstance(x, str): s.st = x
     else:
       s.st = None
+      t = next(iter(x))
+#       s.n = len(t)
+      s.id = tuple(range(len(t)))
       super().__init__(x)
   def __bool__(s): return bool(s.st or len(s)) #super().__bool__() # should empty tuple ==> false?
 #   def __contains__(s,x):
   def __iter__(s):
     # print('called __iter__', type(super().__iter__()))
-    return (pm.Perm(t) for t in super().__iter__())
+    return (pm.Perm(t) for t in super().__iter__() if t != s.id)
   def __str__(s):
     if s.st: return s.st
     else:
@@ -549,24 +552,24 @@ class Graph:
     rv = set() # set of permutations (tuples), identity always valid
     rv.add(next(perms)) # tuple as element
     for l in perms:
-      if debug: print('considering', l)
+      if debug: print('* considering', l)
       for x,y in links:
         if l[x]>l[y]: break
       else:
 #         print('okay')
         if autG: # Does gl already appear in rv, for some g \in autG
-          if debug: print('is elt of Gl already included?')
+          if debug: print('  is elt of Gl already included?')
           # multiply l by every g \in autG, and ask if it is in rv
           for g in autG:
-            if debug:
-              print('g:', type(g), type(l)) #, type(g*l))
-              print('g =', g, l, g*l)
+            if debug: print('  g l gl =', g, l, g*l)
             # if so then skip it
             if g*l in rv:
-#               print('yep')
+              if debug: print('  already included')
               break
             # as an added bonus, can ask which of the two are smaller, and keep the smaller.  This should yield a canonical representative of the labeling, rather than a representative which depends on this algorithm 7jul023
-          else: rv.add(l)
+          else:
+            if debug: print('  including', l)
+            rv.add(l)
         else: rv.add(l)
     return Bijections(rv)
 

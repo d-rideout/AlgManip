@@ -34,7 +34,7 @@ for c in poscau:
   if isinstance(c, int): n = c
   else:
     c += [None]*(5-len(c))
-    getCauset[c[0]] = (causetName[c[0]], n, c[1], c[2], c[3], c[4])
+    getCauset[str(c[0])] = (causetName[c[0]], n, c[1], c[2], c[3], c[4])
 
 # Graph settings for small causets
 gm.Graph.size = 's'

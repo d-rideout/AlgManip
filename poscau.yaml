@@ -47,6 +47,8 @@ Yt: Y-toe
 Ln: L-nugget # This is a standard counter-example
 flop: flower-prime
 inup: inu-prime
+diap: diamond-prime
+flo1: flower1
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # Do I want to include the weight in both directions?  Seems so.
@@ -100,6 +102,8 @@ inup: inu-prime
 - [h,     0b0010110001, tr, [31, inu]]
 - [Np,    0b0010101001, tr, [31, N]]
 - [32,    0b0001100100, tr, [31, [pi,2]]]
+- [diap,  0b0010110011, tr, [dia, nu]]
+- [flo1,  0b0000001011, tcr, [flo, V1]]
 
 # path to spiral-crown
 - [221, 0b0000001100, tcr, [L1, pi], [222]]
