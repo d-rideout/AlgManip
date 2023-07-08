@@ -56,7 +56,8 @@ def nextCauset():
     if debug: print('c=', c)
     if isinstance(c, int):
       n = c
-      if n: print(nc, 'causets\n')
+#       if n: print(nc, f'causets at stage {n-1}\n')
+      if n: print(nc, f'{n-1}-orders\n')
       print('n =', n)
       nc = 0
     elif isinstance(c, dict):
@@ -75,7 +76,7 @@ def randWalk():
   c = getCauset['void']
   while c:
     yield c
-    print('  children =', c[5])
+#     print('  children =', c[5])
     if not c[5]: return
     rc = rm.choices(c[5])
     if isinstance(rc[0], list): rc = rc[0][0]

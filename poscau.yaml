@@ -1,5 +1,5 @@
-# We just provide links for now
-# We try to provide the cannonical labeling for each causet
+# All causets are transitively reduced.
+# We try to provide the cannonical labeling for each causet.
 # Note that cannonical labeling based on links will likely be different from
 # canonical labeling based on relations!  I choose the former for now, even
 # though that is a non-standard choice. 5jul023
@@ -10,15 +10,16 @@
 # * one doc for all causets
 # * allow list for causet, and l: [list]
 
-# Questions / Comments:
 l: list representation (to add fields)
 nm: name
 a: adjacency matrix
 sbs: state of binary storage
 ps: list of parents
 aut: automorphisms (null for trivial?)
+n: |
+  so that incomplete stages do not have to end?
+  But these stages will never complete anyway!!
 # Do I want to store alternate labelings?
-# labelings associated with path??
 ---
 # causet abbreviations
 1ch: 1-chain
@@ -45,6 +46,7 @@ tf: tallflower
 Yt: Y-toe
 Ln: L-nugget # This is a standard counter-example
 flop: flower-prime
+inup: inu-prime
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # Do I want to include the weight in both directions?  Seems so.
@@ -93,6 +95,13 @@ flop: flower-prime
 - [Ln,    0b1100001101, tr, [nu]]
 - [goal,  0b0010100011, tr, [nu]]
 - [flop,  0b0001001101, tr, [nu, flo]]
+- [nu1,   0b0000001101, tr, [nu,[V1,2],31]]
+- [inup,  0b1001100100, tr, [31]]
+- [h,     0b0010110001, tr, [31, inu]]
+- [Np,    0b0010101001, tr, [31, N]]
+- [32,    0b0001100100, tr, [31, [pi,2]]]
 
 # path to spiral-crown
-- [221,   0b0000001100, tcr, [L1, pi], [222]]
+- [221, 0b0000001100, tcr, [L1, pi], [222]]
+- 6
+- [222, 0b000010010100000, tcr, [221], [[322,3]]]

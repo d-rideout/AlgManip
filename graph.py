@@ -36,8 +36,8 @@ import AlgManip.util as um
 # # quit()
 # sys.exit()
 
-# debug = False
-debug = True
+debug = False
+# debug = True
 
 # # Is this general enough to warrant not being internal?
 # # Yes - user will likely need it.
@@ -68,30 +68,28 @@ class Bijections(set):
   # Use ints to store maps?  Leading 0's are suppressed.  See tup2hex() above.
   # But it should be a lot more space efficient? 6jul023
   # store identity to facilitate 'in' queries, but omit from output
-  def __init__(s, x):
+  def __init__(s, x=()):
     'construct with either a string or a set of tuples'
-    # Probably should make x optional, and if none or so call super().__init__()
-#     s.i = n
-    if isinstance(x, str): s.t = 'st'
-    else: s.t = 'set'
-    if debug: print('building Bijections instance from', type(x))
-#     s.bj = x # should I just write s = x or something??
-    s = x # should I just write s = x or something??
-  def __bool__(s): return bool(s.bj) # should empty tuple ==> false?
-#   def __contains__(s,x): if
-  def __iter__(s):
-    print('called __iter__')
-    return s.bj.__iter__()
-  def __str__(s):
-    if s.t=='s': return s.bj
+    if debug: print('constructing Bijections instance from', type(x))
+    if isinstance(x, str): s.st = x
     else:
-      o = len(s.bj)
+      s.st = None
+      super().__init__(x)
+  def __bool__(s): return bool(s.st or len(s)) #super().__bool__() # should empty tuple ==> false?
+#   def __contains__(s,x):
+  def __iter__(s):
+    # print('called __iter__', type(super().__iter__()))
+    return (pm.Perm(t) for t in super().__iter__())
+  def __str__(s):
+    if s.st: return s.st
+    else:
+      o = len(s)
       if o<2: return 'Id' # identity is assumed to always be present
       #       n = len( -- how to check for identity, to remove it??
       #       id = tuple(range(len(t)))
       sep = ''
       rv = ''
-      for t in s.bj:
+      for t in s:
         if _idtup(t): continue
 #         if debug: print('Bijections.__str__:', t) #, '-->', end=' ')
         # rv = ' '.join([_tup2st(t) for t in s.bj])
@@ -555,7 +553,7 @@ class Graph:
       for x,y in links:
         if l[x]>l[y]: break
       else:
-        print('okay')
+#         print('okay')
         if autG: # Does gl already appear in rv, for some g \in autG
           if debug: print('is elt of Gl already included?')
           # multiply l by every g \in autG, and ask if it is in rv
@@ -565,7 +563,7 @@ class Graph:
               print('g =', g, l, g*l)
             # if so then skip it
             if g*l in rv:
-              print('yep')
+#               print('yep')
               break
             # as an added bonus, can ask which of the two are smaller, and keep the smaller.  This should yield a canonical representative of the labeling, rather than a representative which depends on this algorithm 7jul023
           else: rv.add(l)
