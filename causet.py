@@ -19,6 +19,9 @@ poscau = yaml.safe_load_all(fp)
 # Read keyword definitions
 kw = next(poscau) # print(kw.keys()) just store set of keywords? 5jul023
 
+# Read OEIS counts
+no = tuple(next(poscau))
+
 # Read causet abbreviations
 causetName = abbrevDict(next(poscau))
 # Note that causetName will not choke on invalid abbreviations.
@@ -57,7 +60,7 @@ def nextCauset():
     if isinstance(c, int):
       n = c
 #       if n: print(nc, f'causets at stage {n-1}\n')
-      if n: print(nc, f'{n-1}-orders\n')
+      if n: print(nc, f'of {no[n-1]} {n-1}-orders\n')
       print('n =', n)
       nc = 0
     elif isinstance(c, dict):

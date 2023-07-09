@@ -21,6 +21,11 @@ n: |
   But these stages will never complete anyway!!
 # Do I want to store alternate labelings?
 ---
+# OEIS counts oeis.org/A000112
+[1,1,2,5,16,63,318,2045,16999,183231,2567284,
+ 46749427,1104891746,33823827452,1338193159771,
+ 68275077901156,4483130665195087]
+---
 # causet abbreviations
 1ch: 1-chain
 2ch: 2-chain
@@ -49,8 +54,14 @@ flop: flower-prime
 inup: inu-prime
 diap: diamond-prime
 flo1: flower1
+floh: flower-hat
+ker3: kernel3
+
+inup1: inu-prime1
+inup2: inu-prime2
 ---
 # list format: [abbrev, grr, sbs, parents, children]
+# + ==> incomplete list
 # Do I want to include the weight in both directions?  Seems so.
 # include automorphisms?  natural labelings?
 - 0
@@ -68,7 +79,7 @@ flo1: flower1
 - [3ach, 0, tcr, [2ach], [[L1,3],[Lam1,3],iflo,4ach]]
 - 4
 - [4ch, 0b100101, tr, [3ch], [5ch,tallY,Yp,nup,41]]
-- [Y, 0b010101, tr, [3ch], [[Yp,2],scep,tf,Yt, Y1]]
+- [Y, 0b010101, tr, [3ch], [[Yp,2],scep,tf,Yt,Y1]]
 # flesh out stage 4 below before attempting to populate children lists
 - [nu, 0b010011, tr, [3ch, [V,2]]]
 - [31, 0b000101, tr, [3ch, L]]
@@ -104,8 +115,14 @@ flo1: flower1
 - [32,    0b0001100100, tr, [31, [pi,2]]]
 - [diap,  0b0010110011, tr, [dia, nu]]
 - [flo1,  0b0000001011, tcr, [flo, V1]]
+- [bush,  0b0001001011, tcr, [flo]]
+- [floh,  0b0001110011, tr, [[flo,3], dia]]
+- [ker3,  0b1110001011, tr, [flo]]
+
 
 # path to spiral-crown
-- [221, 0b0000001100, tcr, [L1, pi], [222]]
+- [221, 0b0000001100, tcr, [L1, pi], [222,+]]
 - 6
-- [222, 0b000010010100000, tcr, [221], [[322,3]]]
+- [222, 0b000010010100000, tcr, [221], [[inup2,3],+]]
+- 7
+- [inup2, 0b000001000101010100000, tr, [222, inup1, inu2]]
