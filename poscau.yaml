@@ -21,12 +21,14 @@ n: |
   But these stages will never complete anyway!!
 # Do I want to store alternate labelings?
 ---
-# OEIS counts oeis.org/A000112
+# OEIS counts oeis.org/A000112 :
 [1,1,2,5,16,63,318,2045,16999,183231,2567284,
  46749427,1104891746,33823827452,1338193159771,
  68275077901156,4483130665195087]
 ---
-# causet abbreviations
+# Causet abbreviations:
+# It looks like yaml will throw an exception if keys are not unique:
+# stackoverflow.com/questions/47668308/duplicate-key-in-yaml-configuaration-file
 1ch: 1-chain
 2ch: 2-chain
 2ach: 2-antichain
@@ -56,9 +58,18 @@ diap: diamond-prime
 flo1: flower1
 floh: flower-hat
 ker3: kernel3
+dia1: diamond1
 
 inup1: inu-prime1
 inup2: inu-prime2
+tNcl: tallNcowlick
+iscep: isceptre
+Vbt: Vbowtie
+floft: flower-foot
+st: sawtooth
+diac: diamond-cap
+inup: inu-prime
+inuh: inu-hat # (what does hat mean specifically? 10jul023)
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # + ==> incomplete list
@@ -118,11 +129,27 @@ inup2: inu-prime2
 - [bush,  0b0001001011, tcr, [flo]]
 - [floh,  0b0001110011, tr, [[flo,3], dia]]
 - [ker3,  0b1110001011, tr, [flo]]
+- [dia1,  0b0000110011, tr, [dia, V1]]
+- [iscep, 0b1000110011, tr, [dia]]
+- [Vbt,   0b0110110011, tr, [dia]]
+- [V11,   0b0000000011, tcr, [V1, L1]]
+- [V2,    0b0001001100, tcr, [V1, [pi,2]]]
+- [floft, 0b0001001110, tcr, [V1, N]]
+- [st,    0b0001110010, tr, [[V1,2], inu]]
+- [diac,  0b1101010100, tr, [V1]]
+- [311,   0b0000000101, tr, [31,L1]]
+- [inu1,  0b0000101100, tr, [inu, [L1,2]]]
+- [inup,  0b0001101100, tr, [inu, [pi,2]]]
+- [inuh,  0b1000101100, tr, [inu]]
 
-
-# path to spiral-crown
+# path to spiral-crown (KJK)
 - [221, 0b0000001100, tcr, [L1, pi], [222,+]]
 - 6
 - [222, 0b000010010100000, tcr, [221], [[inup2,3],+]]
 - 7
-- [inup2, 0b000001000101010100000, tr, [222, inup1, inu2]]
+- [inup2, 0b000001000101010100000, tr, [222, inup1, inu2], [tNcl,+]]
+- 8
+- [tNcl,  0b0000001000101100101000000100, tr, [inup2, +]]
+
+# royal adjective vs crown noun - same num letters
+# spiral vs twist (image search them)

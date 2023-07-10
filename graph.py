@@ -684,8 +684,9 @@ if __name__=='__main__':
     inPr.writeDag()
   else:
     cs = Graph(4,0b011110)
+    cs.sbs = 'tcr'
     print('cs=', cs)
     cs._dumpState()
     print(cs.automorphism((1,2,0,3)))
-    cs.aut()
+    print(cs.aut())
     cs.writeDag()
