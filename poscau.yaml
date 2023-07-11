@@ -70,6 +70,11 @@ st: sawtooth
 diac: diamond-cap
 inup: inu-prime
 inuh: inu-hat # (what does hat mean specifically? 10jul023)
+btt: bowtie-tail
+iYt: iY-toe
+
+6ch: 6-chain
+5t: 5-toe
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # + ==> incomplete list
@@ -107,7 +112,7 @@ inuh: inu-hat # (what does hat mean specifically? 10jul023)
 - [iflo, 0b111000, tcr, [3ach]]
 - [4ach, 0, tcr, [3ach]]
 - 5
-- [5ch,   0b1000100101, tr, [4ch]]
+- [5ch,   0b1000100101, tr, [4ch], [6ch,5t,+]]
 - [tallY, 0b0100100101, tr, [4ch]]
 - [Yp,    0b0010100101, tr, [4ch, [Y,2]]]
 - [nup,   0b0001100101, tr, [4ch, nu]]
@@ -141,10 +146,18 @@ inuh: inu-hat # (what does hat mean specifically? 10jul023)
 - [inu1,  0b0000101100, tr, [inu, [L1,2]]]
 - [inup,  0b0001101100, tr, [inu, [pi,2]]]
 - [inuh,  0b1000101100, tr, [inu]]
+- [btt,   0b0110110001, tr, [inu]]
+- [pi1,   0b0000001100, tcr, [[L1,2], pi], [222,+]]
+- [w,     0b0001010110, tcr, [N, pi]]
+- [igoal, 0b1000001100, tr, [pi]]
+- [N1,    0b0000001110, tr, [N, [Lam1,2], [L1,2]]]
+- [iYt,   0b0001100110, tr, [N, [iY,2]]]
+
+- 6
+- [6ch, 0b100001000100101, tr, [5ch]]
+- [5t,  0b000011000100101, tr, [5ch,nup]]
 
 # path to spiral-crown (KJK)
-- [221, 0b0000001100, tcr, [L1, pi], [222,+]]
-- 6
 - [222, 0b000010010100000, tcr, [221], [[inup2,3],+]]
 - 7
 - [inup2, 0b000001000101010100000, tr, [222, inup1, inu2], [tNcl,+]]

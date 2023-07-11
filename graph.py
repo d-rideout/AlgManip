@@ -140,13 +140,41 @@ class Bijections(set):
 # And prefer 'node' to 'element', since the latter is not generally used for graphs
 # And 'edge' to 'arc' since the former is more common?  Though it comes from geometry.  Can I avoid the term? (10jan023)
 
-class node: # lower case because it is internal (and nested classes are really confusing)
-  def __init__(s, nl, pst=None, fut=None):
-    if pst==None: pst = set()
-    if fut==None: fut = set()
-    s.nl = nl
-    s.pst = pst
-    s.fut = fut
+# class node: # lower case because it is internal (and nested classes are really confusing)
+#   # No one uses this!!!
+#   def __init__(s, nl, pst=None, fut=None):
+#     if pst==None: pst = set()
+#     if fut==None: fut = set()
+#     s.nl = nl
+#     s.pst = pst
+#     s.fut = fut
+
+def _composeMaps(n, pstns):
+  '''generate sequence of potential causal isomorphisms
+  (automorphisms for now 11jul023)'''
+  print("_composeMap(", pstns, ")")
+  def compMap():
+    'compose map from npsts'
+    phi = [None]*n
+    for pn in pstns:
+      l = pstns[pn]
+      print(pn, ':', l)
+      for i,v in enumerate(l[0]): phi[v] = l[1][i]
+    print('phi =', phi)
+    return tuple(phi)
+
+  # populate dict pstns
+  for pn in pstns:
+    print('|p| =', pn)
+    gen = permutations(pstns[pn][0])
+    pstns[pn].append(next(gen))
+    pstns[pn].append(gen)
+
+  yield compMap()
+
+  # iterate pstns
+#   next(
+
 
 class Graph:
   # make class attributes instance attributes if the need arises (12jan023)
@@ -496,26 +524,27 @@ class Graph:
   def aut(s):
     'return automorphism group of graph, as Bijections instance'
     if not s.gr: return Bijections(f'S{s.n}')
-#     # Compute cardinality of pasts
-#     npsts = {}
-#     for x in range(s.n):
-#       n = s.npst(x)
-#       #npst.append(s.npst(x))
-#       if n in npsts: npsts[n].append(x)
-#       else: npsts[n] = [x]
-#     print(npsts)
-#
-#     # Cycle through permutations of 'level sets'
-#     phi = [None]*s.n
-#     for np in npsts:
-#       print('np=', np)
-#       for npp in permutations(npsts[np]):
-#         print(npp)
-#         for i,v in zip(npsts[np],npp):
-#           print('i,v=', i,v)
-#           phi[i] = v
-#         # ... I need to build a generator function which loops over these permutations.
-#         yield here or something
+    # Compute cardinality of pasts
+    npsts = {}
+    # Dicts are (>=v3.6) stored in the order in which key:value pairs are added!
+    # So it is good (enough) practice to store in order of natural labelings.
+    for x in range(s.n):
+      n = s.npst(x)
+      #npst.append(s.npst(x))
+      if n in npsts: npsts[n][0].append(x)
+      else: npsts[n] = [[x]] # list of lists so I can add more vars later
+    print('npsts =', npsts) # what order of keys shows here?
+    # I don't really want the original dict.  I don't care about the keys
+    # anymore.  All I care about at this point are the values. (?)
+    # Which should be a partition of the ground set into lists.
+
+    # Cycle through permutations of 'level sets'
+    print(next(_composeMaps(s.n, npsts))) #.values())))
+#     phi[i] = v
+        # ... I need to build a generator function which loops over these permutations.
+    exit()
+
+    # brute force approach
     rv = set()
     perms = permutations(range(s.n))
     rv.add(next(perms)) # identity always in automorphism group
