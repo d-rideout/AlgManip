@@ -164,6 +164,8 @@ def _composeMaps(n, pn): # Do users want access to this? 11jul023
     return tuple(phi)
 
   # populate dict pstns
+  ns = len(pn)
+  cont = True
   for ss in pn:
     gen = permutations(ss[0])
     ss.append(next(gen))
@@ -172,12 +174,30 @@ def _composeMaps(n, pn): # Do users want access to this? 11jul023
 
   # iterate pstns
   yield compMap()
-  i = 0
-  while pn[i][1]:
-    pn[i][1] = next(pn[i][2], None)
-    yield compMap()
-  else: print('finished iteration')
-  yield 'keep going?'
+  while cont:
+    pn[0][1] = next(pn[0][2], None)
+    i = 0
+    while not pn[i][1]:
+      print('resetting gen', i)
+      # reset generator
+      pn[i][2] = permutations(pn[i][0])
+      # grab 1st perm
+      pn[i][1] = next(pn[i][2], None)
+      # increment partition elt to right
+      i += 1
+      if i==ns:
+        cont = False
+        break
+      pn[i][1] = next(pn[i][2], None)
+      print('perm', i, pn[i][1])
+    if cont: yield compMap()
+#   i = 0
+#   while pn[i][1]:
+#     pn[i][1] = next(pn[i][2], None)
+#     yield compMap()
+#   else: print('finished iteration')
+#   yield 'keep going?'
+
 
 class Graph:
   # make class attributes instance attributes if the need arises (12jan023)
@@ -545,8 +565,8 @@ class Graph:
     try:
       for phi in _composeMaps(s.n, list(npsts.values())): print('phi =', phi)
     except Exception as e:
-      print('raised something', e)
-    exit('a string?')
+      print('raised:', e)
+    exit('Exiting with exit fn')
 
     # brute force approach
     rv = set()
