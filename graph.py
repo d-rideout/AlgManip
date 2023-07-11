@@ -170,7 +170,7 @@ def _composeMaps(n, pn): # Do users want access to this? 11jul023
     gen = permutations(ss[0])
     ss.append(next(gen))
     ss.append(gen)
-    print('ss =', ss)
+    if debug: print('ss =', ss)
 
   # iterate pstns
   yield compMap()
@@ -178,7 +178,7 @@ def _composeMaps(n, pn): # Do users want access to this? 11jul023
     pn[0][1] = next(pn[0][2], None)
     i = 0
     while not pn[i][1]:
-      print('resetting gen', i)
+      if debug: print('resetting gen', i)
       # reset generator
       pn[i][2] = permutations(pn[i][0])
       # grab 1st perm
@@ -189,7 +189,7 @@ def _composeMaps(n, pn): # Do users want access to this? 11jul023
         cont = False
         break
       pn[i][1] = next(pn[i][2], None)
-      print('perm', i, pn[i][1])
+      if debug: print('perm', i, pn[i][1])
     if cont: yield compMap()
 #   i = 0
 #   while pn[i][1]:
@@ -547,6 +547,7 @@ class Graph:
   def aut(s):
     'return automorphism group of graph, as Bijections instance'
     if not s.gr: return Bijections(f'S{s.n}')
+
     # Compute cardinality of pasts
     npsts = {}
     # Dicts are (>=v3.6) stored in the order in which key:value pairs are added!
@@ -556,24 +557,28 @@ class Graph:
       #npst.append(s.npst(x))
       if n in npsts: npsts[n][0].append(x)
       else: npsts[n] = [[x]] # list of lists so I can add more vars later
-    print('npsts =', npsts) # what order of keys shows here?
+    if debug: print('npsts =', npsts)
     # I don't really want the original dict.  I don't care about the keys
     # anymore.  All I care about at this point are the values. (?)
     # Which should be a partition of the ground set into lists.
 
     # Cycle through permutations of 'level sets'
-    try:
-      for phi in _composeMaps(s.n, list(npsts.values())): print('phi =', phi)
-    except Exception as e:
-      print('raised:', e)
-    exit('Exiting with exit fn')
+    rv = set()
+    phig = _composeMaps(s.n, list(npsts.values()))
+    rv.add(next(phig)) # identity always in automorphism group
+#     try:
+    for phi in phig:
+      if s.automorphism(phi): rv.add(phi)
+      #print('phi =', phi)
+#     except Exception as e:
+#       print('raised:', e)
+#     exit('Exiting with exit fn')
 
     # brute force approach
-    rv = set()
-    perms = permutations(range(s.n))
-    rv.add(next(perms)) # identity always in automorphism group
-    for phi in perms:
-      if s.automorphism(phi): rv.add(phi)
+#     perms = permutations(range(s.n))
+#     rv.add(next(perms)) # identity always in automorphism group
+#     for phi in perms:
+#       if s.automorphism(phi): rv.add(phi)
       #     print('Graph.aut:', rv)
     return Bijections(rv)
   #     if rv:
