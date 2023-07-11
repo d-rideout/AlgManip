@@ -149,32 +149,35 @@ class Bijections(set):
 #     s.pst = pst
 #     s.fut = fut
 
-def _composeMaps(n, pstns):
-  '''generate sequence of potential causal isomorphisms
-  (automorphisms for now 11jul023)'''
-  print("_composeMap(", pstns, ")")
+def _composeMaps(n, pn): # Do users want access to this? 11jul023
+  '''Generate sequence of potential causal isomorphisms
+  (automorphisms for now 11jul023)
+  from partition of ground set'''
+#   print("_composeMap(", pn, ")")
   def compMap():
-    'compose map from npsts'
+    'compose map from p'
     phi = [None]*n
-    for pn in pstns:
-      l = pstns[pn]
-      print(pn, ':', l)
-      for i,v in enumerate(l[0]): phi[v] = l[1][i]
-    print('phi =', phi)
+    for ss in pn:
+#       print('ss =', ss)
+      for i,v in enumerate(ss[0]): phi[v] = ss[1][i]
+#     print('ret phi =', phi)
     return tuple(phi)
 
   # populate dict pstns
-  for pn in pstns:
-    print('|p| =', pn)
-    gen = permutations(pstns[pn][0])
-    pstns[pn].append(next(gen))
-    pstns[pn].append(gen)
-
-  yield compMap()
+  for ss in pn:
+    gen = permutations(ss[0])
+    ss.append(next(gen))
+    ss.append(gen)
+    print('ss =', ss)
 
   # iterate pstns
-#   next(
-
+  yield compMap()
+  i = 0
+  while pn[i][1]:
+    pn[i][1] = next(pn[i][2], None)
+    yield compMap()
+  else: print('finished iteration')
+  yield 'keep going?'
 
 class Graph:
   # make class attributes instance attributes if the need arises (12jan023)
@@ -539,10 +542,11 @@ class Graph:
     # Which should be a partition of the ground set into lists.
 
     # Cycle through permutations of 'level sets'
-    print(next(_composeMaps(s.n, npsts))) #.values())))
-#     phi[i] = v
-        # ... I need to build a generator function which loops over these permutations.
-    exit()
+    try:
+      for phi in _composeMaps(s.n, list(npsts.values())): print('phi =', phi)
+    except Exception as e:
+      print('raised something', e)
+    exit('a string?')
 
     # brute force approach
     rv = set()
