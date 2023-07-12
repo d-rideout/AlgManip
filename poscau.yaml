@@ -70,11 +70,26 @@ st: sawtooth
 diac: diamond-cap
 inup: inu-prime
 inuh: inu-hat # (what does hat mean specifically? 10jul023)
-btt: bowtie-tail
+bttl: bowtie-tail
 iYt: iY-toe
+btte: bowtie-toe
+diatl: diamond-tail
+bt1: bowtie1
+pt: putter
+bth: bowtie-hat
+Lam2: Lambda2
+iflote: iflower-toe
+itY: itallY
+Lam11: Lambda11
+LL: Lam^Lam
+btc: bowtie-cap
+iflo1: iflower1
+itf: itallflower
+5ach: 5-antichain
 
 6ch: 6-chain
 5t: 5-toe
+Yp2: Y-prime2
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # + ==> incomplete list
@@ -93,11 +108,12 @@ iYt: iY-toe
 - [L, 1, tcr, [2ch, [2ach,2]], [31,V1,inu,pi,N,L1]]
 - [Lam, 6, tcr, [2ach], [[N,2],bt,iY,Lam1]]
 - [3ach, 0, tcr, [2ach], [[L1,3],[Lam1,3],iflo,4ach]]
+
 - 4
 - [4ch, 0b100101, tr, [3ch], [5ch,tallY,Yp,nup,41]]
 - [Y, 0b010101, tr, [3ch], [[Yp,2],scep,tf,Yt,Y1]]
-# flesh out stage 4 below before attempting to populate children lists
-- [nu, 0b010011, tr, [3ch, [V,2]]]
+- [nu, 0b010011, tr, [3ch, [V,2]], [nup,Yt,Ln,goal,flop,nu1,diap]]
+
 - [31, 0b000101, tr, [3ch, L]]
 - [dia, 0b110011, tr, [V]]
 - [flo, 0b001011, tcr, [V]]
@@ -111,51 +127,77 @@ iYt: iY-toe
 - [Lam1, 6, tcr, [Lam, [3ach, 3]]]
 - [iflo, 0b111000, tcr, [3ach]]
 - [4ach, 0, tcr, [3ach]]
+
 - 5
-- [5ch,   0b1000100101, tr, [4ch], [6ch,5t,+]]
-- [tallY, 0b0100100101, tr, [4ch]]
-- [Yp,    0b0010100101, tr, [4ch, [Y,2]]]
-- [nup,   0b0001100101, tr, [4ch, nu]]
-- [41,    0b0000100101, tr, [4ch, 31]]
-- [scep,  0b1100010101, tr, [Y]]
-- [tf,    0b0010010101, tr, [Y]]
-- [Yt,    0b0001010101, tr, [Y, nu]]
-- [Y1,    0b0000010101, tr, [Y, 31]]
-- [Ln,    0b1100001101, tr, [nu]]
-- [goal,  0b0010100011, tr, [nu]]
-- [flop,  0b0001001101, tr, [nu, flo]]
-- [nu1,   0b0000001101, tr, [nu,[V1,2],31]]
-- [inup,  0b1001100100, tr, [31]]
-- [h,     0b0010110001, tr, [31, inu]]
-- [Np,    0b0010101001, tr, [31, N]]
-- [32,    0b0001100100, tr, [31, [pi,2]]]
-- [diap,  0b0010110011, tr, [dia, nu]]
-- [flo1,  0b0000001011, tcr, [flo, V1]]
-- [bush,  0b0001001011, tcr, [flo]]
-- [floh,  0b0001110011, tr, [[flo,3], dia]]
-- [ker3,  0b1110001011, tr, [flo]]
-- [dia1,  0b0000110011, tr, [dia, V1]]
-- [iscep, 0b1000110011, tr, [dia]]
-- [Vbt,   0b0110110011, tr, [dia]]
-- [V11,   0b0000000011, tcr, [V1, L1]]
-- [V2,    0b0001001100, tcr, [V1, [pi,2]]]
-- [floft, 0b0001001110, tcr, [V1, N]]
-- [st,    0b0001110010, tr, [[V1,2], inu]]
-- [diac,  0b1101010100, tr, [V1]]
-- [311,   0b0000000101, tr, [31,L1]]
-- [inu1,  0b0000101100, tr, [inu, [L1,2]]]
-- [inup,  0b0001101100, tr, [inu, [pi,2]]]
-- [inuh,  0b1000101100, tr, [inu]]
-- [btt,   0b0110110001, tr, [inu]]
-- [pi1,   0b0000001100, tcr, [[L1,2], pi], [222,+]]
-- [w,     0b0001010110, tcr, [N, pi]]
-- [igoal, 0b1000001100, tr, [pi]]
-- [N1,    0b0000001110, tr, [N, [Lam1,2], [L1,2]]]
-- [iYt,   0b0001100110, tr, [N, [iY,2]]]
+- [5ch,    0b1000100101, tr, [4ch], [6ch,5t,+]]
+- [tallY,  0b0100100101, tr, [4ch]]
+- [Yp,     0b0010100101, tr, [4ch, [Y,2]]]
+- [nup,    0b0001100101, tr, [4ch, nu]]
+- [41,     0b0000100101, tr, [4ch, 31]]
+- [scep,   0b1100010101, tr, [Y]]
+- [tf,     0b0010010101, tr, [Y]]
+- [Yt,     0b0001010101, tr, [Y, nu]]
+- [Y1,     0b0000010101, tr, [Y, 31]]
+- [Ln,     0b1100001101, tr, [nu]]
+- [goal,   0b0010100011, tr, [nu]]
+- [flop,   0b0001001101, tr, [nu, flo]]
+- [nu1,    0b0000001101, tr, [nu,[V1,2],31]]
+- [inup,   0b1001100100, tr, [31]]
+- [h,      0b0010110001, tr, [31, inu]]
+- [Np,     0b0010101001, tr, [31, N]]
+- [32,     0b0001100100, tr, [31, [pi,2]]]
+- [diap,   0b0010110011, tr, [dia, nu]]
+- [flo1,   0b0000001011, tcr, [flo, V1]]
+- [bush,   0b0001001011, tcr, [flo]]
+- [floh,   0b0001110011, tr, [[flo,3], dia]]
+- [ker3,   0b1110001011, tr, [flo]]
+- [dia1,   0b0000110011, tr, [dia, V1]]
+- [iscep,  0b1000110011, tr, [dia]]
+- [Vbt,    0b0110110011, tr, [dia]]
+- [V11,    0b0000000011, tcr, [V1, L1]]
+- [V2,     0b0001001100, tcr, [V1, [pi,2]]]
+- [floft,  0b0001001110, tcr, [V1, N]]
+- [st,     0b0001110010, tr, [[V1,2], inu]]
+- [diac,   0b1101010100, tr, [V1]]
+- [311,    0b0000000101, tr, [31,L1]]
+- [inu1,   0b0000101100, tr, [inu, [L1,2]]]
+- [inup,   0b0001101100, tr, [inu, [pi,2]]]
+- [inuh,   0b1000101100, tr, [inu]]
+- [bttl,   0b0110110001, tr, [inu]]
+- [pi1,    0b0000001100, tcr, [[L1,2], pi], [222,+]]
+- [w,      0b0001010110, tcr, [N, pi]]
+- [igoal,  0b1000001100, tr, [pi]]
+- [N1,     0b0000001110, tr, [N, [Lam1,2], [L1,2]]]
+- [iYt,    0b0001100110, tr, [N, [iY,2]]]
+- [btte,   0b0001011110, tcr, [[bt,2], N]]
+- [sail,   0b0011110010, tr, [N, inu]]
+- [diatl,  0b1100001110, tr, [N]]
+- [bt1,    0b0000011110, tcr, [bt, Lam1]]
+- [pt,     0b0011100110, tr, [[bt,2], iY]]
+- [king,   0b0011011110, tcr, [bt]]
+- [bth,    0b1100011110, tr, [bt]]
+- [L11,    0b0000000001, tcr, [L1, [4ach,4]]]
+- [Lam2,   0b0001110000, tcr, [Lam1, L1]]
+- [iflote, 0b0001111000, tcr, [[iflo,3], L1]]
+- [up,     0b1011100000, tr, [L1]]
+- [iY1,    0b0000100110, tr, [iY, Lam1]]
+- [x,      0b0100100110, tr, [iY]]
+- [itY,    0b1000100110, tr, [iY]]
+- [Lam11,  0b0000000110, tcr, [Lam1, [4ach,6]]]
+- [iw,     0b0011101000, tcr, [[Lam1,2]]]
+- [LL,     0b1001110000, tr, [Lam1]]
+- [btc,    0b0011111000, tcr, [Lam1, [iflo,3]]]
+- [iflo1,  0b0000111000, tcr, [iflo, [4ach,4]]]
+- [itf,    0b1000111000, tr, [iflo]]
+- [iking,  0b0111111000, tcr, [iflo]]
+- [ibush,  0b1111000000, tcr, [4ach]]
+- [5ach, 0, tcr, [4ach]]
 
 - 6
 - [6ch, 0b100001000100101, tr, [5ch]]
+- [51,  0b000001000100101, tr, [5ch, 41]]
 - [5t,  0b000011000100101, tr, [5ch,nup]]
+- [Yp2, 0b000101000100101, tr, [5ch, Yp]]
 
 # path to spiral-crown (KJK)
 - [222, 0b000010010100000, tcr, [221], [[inup2,3],+]]

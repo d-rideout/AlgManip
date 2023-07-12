@@ -163,10 +163,11 @@ def _composeMaps(n, pn): # Do users want access to this? 11jul023
 #     print('ret phi =', phi)
     return tuple(phi)
 
-  # populate dict pstns
+  # populate pn list
   ns = len(pn)
   cont = True
   for ss in pn:
+    # Please eliminate singletons and hard code them into phi!! 11jul023
     gen = permutations(ss[0])
     ss.append(next(gen))
     ss.append(gen)
