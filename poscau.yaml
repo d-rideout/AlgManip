@@ -90,6 +90,8 @@ itf: itallflower
 6ch: 6-chain
 5t: 5-toe
 Yp2: Y-prime2
+tYp: tallY-prime
+t3Y: tall3Y
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # + ==> incomplete list
@@ -97,11 +99,14 @@ Yp2: Y-prime2
 # include automorphisms?  natural labelings?
 - 0
 - [void, null, tcr, null, [1ch]]
+
 - 1
 - [1ch, null, tcr, [void], [2ch,2ach]]
+
 - 2
 - [2ch, 1, tcr, [1ch], [3ch,V,L]]
 - [2ach, 0, tcr, [1ch], [[L,2],Lam,3ach]]
+
 - 3
 - [3ch, 5, tr, [2ch], [4ch,Y,nu,31]]
 - [V, 3, tcr, [2ch], [[nu,2],flo,dia,V1]]
@@ -113,9 +118,9 @@ Yp2: Y-prime2
 - [4ch, 0b100101, tr, [3ch], [5ch,tallY,Yp,nup,41]]
 - [Y, 0b010101, tr, [3ch], [[Yp,2],scep,tf,Yt,Y1]]
 - [nu, 0b010011, tr, [3ch, [V,2]], [nup,Yt,Ln,goal,flop,nu1,diap]]
+- [31, 0b000101, tr, [3ch, L], [41,Y1,nu1,inup,h,Np,32,311]]
+- [dia, 0b110011, tr, [V], [diap,floh,dia1,iscep,Vbt]]
 
-- [31, 0b000101, tr, [3ch, L]]
-- [dia, 0b110011, tr, [V]]
 - [flo, 0b001011, tcr, [V]]
 - [V1, 0b000011, tcr, [V, L]]
 - [inu, 0b101100, tr, [L]]
@@ -129,7 +134,7 @@ Yp2: Y-prime2
 - [4ach, 0, tcr, [3ach]]
 
 - 5
-- [5ch,    0b1000100101, tr, [4ch], [6ch,5t,+]]
+- [5ch,    0b1000100101, tr, [4ch], [51,5t,Yp2,tYp,t3Y,6ch]]
 - [tallY,  0b0100100101, tr, [4ch]]
 - [Yp,     0b0010100101, tr, [4ch, [Y,2]]]
 - [nup,    0b0001100101, tr, [4ch, nu]]
@@ -194,10 +199,12 @@ Yp2: Y-prime2
 - [5ach, 0, tcr, [4ach]]
 
 - 6
-- [6ch, 0b100001000100101, tr, [5ch]]
 - [51,  0b000001000100101, tr, [5ch, 41]]
-- [5t,  0b000011000100101, tr, [5ch,nup]]
+- [5t,  0b000011000100101, tr, [5ch, nup]]
 - [Yp2, 0b000101000100101, tr, [5ch, Yp]]
+- [tYp, 0b001001000100101, tr, [5ch, [tY,2]]]
+- [t3Y, 0b010001000100101, tr, [5ch]]
+- [6ch, 0b100001000100101, tr, [5ch]]
 
 # path to spiral-crown (KJK)
 - [222, 0b000010010100000, tcr, [221], [[inup2,3],+]]
