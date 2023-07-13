@@ -45,6 +45,7 @@ bt: bowtie
 Lam1: Lambda1
 iflo: iflower
 4ach: 4-antichain
+
 5ch: 5-chain
 Yp: Y-prime
 nup: nu-prime
@@ -56,10 +57,9 @@ flop: flower-prime
 inup: inu-prime
 diap: diamond-prime
 flo1: flower1
-floh: flower-hat
+floh: flower-hat # Is diamond-toe a better name?
 ker3: kernel3
 dia1: diamond1
-
 inup1: inu-prime1
 inup2: inu-prime2
 tNcl: tallNcowlick
@@ -70,7 +70,7 @@ st: sawtooth
 diac: diamond-cap
 inup: inu-prime
 inuh: inu-hat # (what does hat mean specifically? 10jul023)
-bttl: bowtie-tail
+bttl: bowtie-tail # bt-tl?
 iYt: iY-toe
 btte: bowtie-toe
 diatl: diamond-tail
@@ -120,18 +120,17 @@ t3Y: tall3Y
 - [nu, 0b010011, tr, [3ch, [V,2]], [nup,Yt,Ln,goal,flop,nu1,diap]]
 - [31, 0b000101, tr, [3ch, L], [41,Y1,nu1,inup,h,Np,32,311]]
 - [dia, 0b110011, tr, [V], [diap,floh,dia1,iscep,Vbt]]
-
-- [flo, 0b001011, tcr, [V]]
-- [V1, 0b000011, tcr, [V, L]]
-- [inu, 0b101100, tr, [L]]
-- [pi, 0b001100, tcr, [L], [221]]
-- [L1, 1, tcr, [L, [3ach,3]], [L1]]
-- [iY, 0b100110, tr, [Lam]]
-- [N, 0b001110, tcr, [[Lam,2], L]]
-- [bt, 0b011110, tcr, [Lam]]
-- [Lam1, 6, tcr, [Lam, [3ach, 3]]]
-- [iflo, 0b111000, tcr, [3ach]]
-- [4ach, 0, tcr, [3ach]]
+- [flo, 0b001011, tcr, [V], [[flop,3],flo1,bush,[floh,3],ker3]]
+- [V1, 0b000011, tcr, [V, L], [[nu1,2],flo1,dia1,V11,V2,floft,[st,2],diac]]
+- [inu, 0b101100, tr, [L], [h,st,inu1,inup,inuh,bttl,sail]]
+- [pi, 0b001100, tcr, [L], [pi1,[V2,2],[32,2],[inup,2],w,igoal]]
+- [L1, 1, tcr, [L, [3ach,3]], [V11,311,[inu1,2],[pi1,2],[N1,2],L11,Lam2,iflote,up]]
+- [iY, 0b100110, tr, [Lam], [[iYt,2],pt,iY1,x,itY]]
+- [N, 0b001110, tcr, [[Lam,2], L], [Np,floft,w,N1,iYt,btte,sail,diatl]]
+- [bt, 0b011110, tcr, [Lam], [bt1,[btte,2],[pt,2],king,bth]]
+- [Lam1, 6, tcr, [Lam, [3ach, 3]], [[N1,2],bt1,Lam2,iY1,Lam11,[iw,2],LL,btc]]
+- [iflo, 0b111000, tcr, [3ach], [[iflote,3],[btc,3],iflo1,itf,iking]]
+- [4ach, 0, tcr, [3ach], [[L11,4],[Lam11,6],[iflo1,4],ibush,5ach]]
 
 - 5
 - [5ch,    0b1000100101, tr, [4ch], [51,5t,Yp2,tYp,t3Y,6ch]]
@@ -145,7 +144,7 @@ t3Y: tall3Y
 - [Y1,     0b0000010101, tr, [Y, 31]]
 - [Ln,     0b1100001101, tr, [nu]]
 - [goal,   0b0010100011, tr, [nu]]
-- [flop,   0b0001001101, tr, [nu, flo]]
+- [flop,   0b0001001101, tr, [nu, [flo,3]]]
 - [nu1,    0b0000001101, tr, [nu,[V1,2],31]]
 - [inup,   0b1001100100, tr, [31]]
 - [h,      0b0010110001, tr, [31, inu]]
@@ -175,7 +174,7 @@ t3Y: tall3Y
 - [N1,     0b0000001110, tr, [N, [Lam1,2], [L1,2]]]
 - [iYt,    0b0001100110, tr, [N, [iY,2]]]
 - [btte,   0b0001011110, tcr, [[bt,2], N]]
-- [sail,   0b0011110010, tr, [N, inu]]
+- [sail,   0b0011110010, tr, [N, inu]] # tooth?? itooth??
 - [diatl,  0b1100001110, tr, [N]]
 - [bt1,    0b0000011110, tcr, [bt, Lam1]]
 - [pt,     0b0011100110, tr, [[bt,2], iY]]
