@@ -79,6 +79,7 @@ pt: putter
 bth: bowtie-hat
 Lam2: Lambda2
 iflote: iflower-toe
+tY: tallY
 itY: itallY
 Lam11: Lambda11
 LL: Lam^Lam
@@ -89,9 +90,21 @@ itf: itallflower
 
 6ch: 6-chain
 5t: 5-toe
-Yp2: Y-prime2
+Y2p: Y-2prime
 tYp: tallY-prime
 t3Y: tall3Y
+tY1: tallY1
+tYte: tallY-toe
+t2flo: tall2flower
+tYp: tallY-prime
+tscep: tallSceptre
+Yp1: Y-prime1
+YPte: Y-prime-toe
+tfp: tallflower-prime
+bVtl: bigV-tail
+Yv: Y^v
+scepp: sceptre-prime
+Lntl: L-nugget-tail
 ---
 # list format: [abbrev, grr, sbs, parents, children]
 # + ==> incomplete list
@@ -134,8 +147,8 @@ t3Y: tall3Y
 
 - 5
 - [5ch,    0b1000100101, tr, [4ch], [51,5t,Yp2,tYp,t3Y,6ch]]
-- [tallY,  0b0100100101, tr, [4ch]]
-- [Yp,     0b0010100101, tr, [4ch, [Y,2]]]
+- [tY,     0b0100100101, tr, [4ch], [tY1,tYte,dance,t2flo,[tYp,2],tscep]]
+- [Yp,     0b0010100101, tr, [4ch, [Y,2]], [Yp1,Ypte,tfp,bVtl,Yv,Y2p,scepp,Lntl]]
 - [nup,    0b0001100101, tr, [4ch, nu]]
 - [41,     0b0000100101, tr, [4ch, 31]]
 - [scep,   0b1100010101, tr, [Y]]
@@ -198,12 +211,28 @@ t3Y: tall3Y
 - [5ach, 0, tcr, [4ach]]
 
 - 6
-- [51,  0b000001000100101, tr, [5ch, 41]]
-- [5t,  0b000011000100101, tr, [5ch, nup]]
-- [Yp2, 0b000101000100101, tr, [5ch, Yp]]
-- [tYp, 0b001001000100101, tr, [5ch, [tY,2]]]
-- [t3Y, 0b010001000100101, tr, [5ch]]
-- [6ch, 0b100001000100101, tr, [5ch]]
+- [51,    0b000001000100101, tr, [5ch, 41]]
+- [5t,    0b000011000100101, tr, [5ch, nup]]
+- [Y2p,   0b000101000100101, tr, [5ch, Yp]]
+- [tYp,   0b001001000100101, tr, [5ch, [tY,2]]]
+- [t3Y,   0b010001000100101, tr, [5ch]]
+- [6ch,   0b100001000100101, tr, [5ch]]
+- [tY1,   0b000000100100101, tr, [tY, 41]]
+- [tYte,  0b000010100100101, tr, [tY, nup]]
+- [dance, 0b000100100100101, tr, [tY, Yp]]
+- [t2flo, 0b001000100100101, tr, [tY]]
+- [tYp,   0b001001000100101, tr, [5ch, [tY,2]]]
+- [tscep, 0b110000100100101, tr, [tY]]
+- [Yp1,   0b000000010100101, tr, [Yp, 41, [Y1,2]]]
+- [Ypte,  0b000010010100101, tr, [Yp, nup, [Yt,2]]]
+- [tfp,   0b000100010100101, tr, [[tf,3], Yp]]
+- [bVtl,  0b001001000010101, tr, [Yp]]
+- [Yv,    0b000100100100101, tr, [Yp, tY]]
+- [scepp, 0b001001100010101, tr, [[scep,2], Yp]]
+- [Lntl,  0b101001000010101, tr, [Yp]]
+# 1 This is getting to be difficult to do by hand, without a visual catalog.
+# 2 Can also automate the entire process. 14jul023
+
 
 # path to spiral-crown (KJK)
 - [222, 0b000010010100000, tcr, [221], [[inup2,3],+]]
